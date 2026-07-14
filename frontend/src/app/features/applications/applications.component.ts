@@ -31,6 +31,7 @@ export class ApplicationsComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
 
   showDemoModal: boolean = false;
+  isMobileView: boolean = false;
   selectedApplication: Application | null = null;
   demoUrl: SafeResourceUrl | null = null;
   isLoadingDemo: boolean = false;
@@ -51,6 +52,7 @@ export class ApplicationsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.updateViewportState();
     this.loadApplications();
   }
 
@@ -142,7 +144,27 @@ export class ApplicationsComponent implements OnInit, OnDestroy {
   }
 
   onViewApplication(application: Application): void {
+    if (this.isMobileView) {
+      return;
+    }
+
     this.openDemoModal(application);
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.updateViewportState();
+  }
+
+  private updateViewportState(): void {
+    this.isMobileView = window.innerWidth <= 768;
+
+    if (this.isMobileView && this.showDemoModal) {
+      this.closeDemoModal();
+      return;
+    }
+
+    this.cdr.detectChanges();
   }
 
   private openDemoModal(application: Application): void {
