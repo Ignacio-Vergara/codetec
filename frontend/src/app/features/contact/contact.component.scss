@@ -1,0 +1,404 @@
+// ============================================
+// VP SOLUTIONS - Estilos Contacto
+// ============================================
+
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.contact {
+  min-height: 100vh;
+
+  // ---------- Header ----------
+  .section-header {
+    text-align: center;
+    margin-bottom: $spacing-3xl;
+
+    .section-tag {
+      display: inline-block;
+      color: $accent;
+      font-family: $font-family-code;
+      font-size: $font-size-sm;
+      background: rgba($accent, 0.1);
+      padding: $spacing-xs $spacing-lg;
+      border-radius: 20px;
+      border: 1px solid rgba($accent, 0.2);
+      margin-bottom: $spacing-md;
+    }
+
+    .section-title {
+      font-size: $font-size-4xl;
+      margin-bottom: $spacing-md;
+
+      span {
+        @include gradient-text;
+      }
+
+      @include respond-to(md) {
+        font-size: $font-size-3xl;
+      }
+    }
+
+    .section-subtitle {
+      color: $text-secondary;
+      font-size: $font-size-lg;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.8;
+
+      @include respond-to(md) {
+        font-size: $font-size-base;
+      }
+    }
+  }
+
+  // ---------- Wrapper ----------
+  .contact-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: $spacing-3xl;
+
+    @include respond-to(lg) {
+      grid-template-columns: 1fr;
+      gap: $spacing-2xl;
+    }
+  }
+
+  // ---------- Información ----------
+  .contact-info {
+    background: $bg-surface;
+    border: 1px solid $bg-secondary;
+    border-radius: $border-radius-lg;
+    padding: $spacing-xl;
+    height: fit-content;
+
+    h2 {
+      font-family: $font-family-heading;
+      font-size: $font-size-xl;
+      font-weight: 600;
+      margin-bottom: $spacing-sm;
+    }
+
+    .info-description {
+      color: $text-secondary;
+      font-size: $font-size-sm;
+      line-height: 1.6;
+      margin-bottom: $spacing-xl;
+    }
+  }
+
+  .info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-xl;
+  }
+
+  .info-item {
+    display: flex;
+    gap: $spacing-md;
+    align-items: flex-start;
+    padding: $spacing-md;
+    background: $bg-primary;
+    border-radius: $border-radius-md;
+    transition: all $transition-base;
+
+    &:hover {
+      border-color: $primary;
+      transform: translateX(4px);
+    }
+
+    .info-icon {
+      width: 45px;
+      height: 45px;
+      min-width: 45px;
+      @include flex-center;
+      background: rgba($primary, 0.1);
+      border-radius: $border-radius-md;
+      color: $primary;
+      font-size: $font-size-lg;
+    }
+
+    .info-content {
+      h4 {
+        font-family: $font-family-heading;
+        font-size: $font-size-sm;
+        font-weight: 600;
+        margin: 0 0 $spacing-xs 0;
+      }
+
+      p {
+        color: $text-secondary;
+        font-size: $font-size-sm;
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      .info-link {
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-xs;
+        color: $primary;
+        font-size: $font-size-sm;
+        font-weight: 500;
+        margin-top: $spacing-xs;
+        transition: all $transition-fast;
+
+        &:hover {
+          color: $primary-hover;
+          gap: $spacing-md;
+        }
+      }
+    }
+  }
+
+  // ---------- Redes Sociales ----------
+  .social-links {
+    h4 {
+      font-family: $font-family-heading;
+      font-size: $font-size-sm;
+      font-weight: 600;
+      margin-bottom: $spacing-md;
+    }
+
+    .social-icons {
+      display: flex;
+      gap: $spacing-sm;
+
+      a {
+        @include flex-center;
+        width: 40px;
+        height: 40px;
+        background: $bg-primary;
+        color: $text-secondary;
+        border-radius: 50%;
+        transition: all $transition-base;
+        text-decoration: none;
+
+        &:hover {
+          background: $primary;
+          color: $text-primary;
+          transform: translateY(-3px);
+          box-shadow: 0 4px 15px rgba($primary, 0.3);
+        }
+
+        i {
+          font-size: $font-size-lg;
+        }
+      }
+    }
+  }
+
+  // ---------- Formulario ----------
+  .contact-form-wrapper {
+    background: $bg-surface;
+    border: 1px solid $bg-secondary;
+    border-radius: $border-radius-lg;
+    padding: $spacing-xl;
+
+    h2 {
+      font-family: $font-family-heading;
+      font-size: $font-size-xl;
+      font-weight: 600;
+      margin-bottom: $spacing-xl;
+    }
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  .form-group {
+    label {
+      display: block;
+      font-size: $font-size-sm;
+      font-weight: 500;
+      color: $text-secondary;
+      margin-bottom: $spacing-xs;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: $spacing-md;
+      background: $bg-primary;
+      border: 1px solid $bg-secondary;
+      border-radius: $border-radius-md;
+      color: $text-primary;
+      font-family: $font-family-body;
+      font-size: $font-size-base;
+      transition: all $transition-base;
+      resize: vertical;
+
+      &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+      }
+
+      &.is-invalid {
+        border-color: #FF6B6B;
+        
+        &:focus {
+          box-shadow: 0 0 0 3px rgba(#FF6B6B, 0.1);
+        }
+      }
+
+      &::placeholder {
+        color: $text-secondary;
+        font-size: $font-size-sm;
+      }
+
+      &:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0 1000px $bg-primary inset !important;
+        -webkit-text-fill-color: $text-primary !important;
+      }
+    }
+
+    textarea.form-control {
+      min-height: 120px;
+      font-family: $font-family-body;
+    }
+
+    .char-counter {
+      text-align: right;
+      font-size: $font-size-xs;
+      color: $text-secondary;
+      margin-top: $spacing-xs;
+    }
+
+    .error-message {
+      color: #FF6B6B;
+      font-size: $font-size-xs;
+      margin-top: $spacing-xs;
+    }
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-lg;
+
+    @include respond-to(md) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    padding: $spacing-sm 0;
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      margin-top: 2px;
+      accent-color: $primary;
+      cursor: pointer;
+      
+      &.is-invalid {
+        outline: 2px solid #FF6B6B;
+        outline-offset: 2px;
+      }
+    }
+
+    label {
+      font-size: $font-size-sm;
+      color: $text-secondary;
+      line-height: 1.5;
+
+      a {
+        color: $primary;
+        text-decoration: underline;
+        
+        &:hover {
+          color: $primary-hover;
+        }
+      }
+    }
+
+    .error-message {
+      grid-column: 1 / -1;
+      margin-top: $spacing-xs;
+    }
+  }
+
+  // ---------- Botón ----------
+  .btn-submit {
+    padding: $spacing-md $spacing-xl;
+    background: $primary;
+    color: $text-primary;
+    border: none;
+    border-radius: $border-radius-md;
+    font-family: $font-family-body;
+    font-size: $font-size-base;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all $transition-base;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-sm;
+
+    &:hover:not(:disabled) {
+      background: $primary-hover;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba($primary, 0.3);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    i {
+      font-size: $font-size-base;
+    }
+  }
+
+  // ---------- Alertas ----------
+  .alert-success,
+  .alert-error {
+    padding: $spacing-md $spacing-lg;
+    border-radius: $border-radius-md;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    font-size: $font-size-sm;
+    animation: slideDown 0.3s ease;
+
+    i {
+      font-size: $font-size-lg;
+    }
+  }
+
+  .alert-success {
+    background: rgba(#00FF88, 0.1);
+    border: 1px solid rgba(#00FF88, 0.3);
+    color: #00FF88;
+  }
+
+  .alert-error {
+    background: rgba(#FF6B6B, 0.1);
+    border: 1px solid rgba(#FF6B6B, 0.3);
+    color: #FF6B6B;
+  }
+}
+
+// ---------- Animaciones ----------
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

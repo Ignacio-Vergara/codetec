@@ -1,0 +1,57 @@
+// ============================================
+// VP SOLUTIONS - Estilos del Layout Principal
+// ============================================
+
+@import '../styles/variables';
+@import '../styles/mixins';
+
+// Fondo de partículas
+.particles-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: $bg-primary;
+  overflow: hidden;
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+main {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - 70px - 200px);
+  padding-top: 70px;
+
+  @include respond-to(md) {
+    min-height: calc(100vh - 64px - 160px);
+    padding-top: 64px;
+  }
+}
+
+// El footer debe estar por encima del canvas
+app-footer {
+  position: relative;
+  z-index: 2;
+}
+
+router-outlet + * {
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

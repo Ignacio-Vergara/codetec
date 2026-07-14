@@ -1,0 +1,187 @@
+<!-- ============================================
+CODETEC - Contacto
+============================================ -->
+
+<section class="contact section-padding">
+  <div class="container">
+    <!-- Header -->
+    <div class="section-header">
+      <span class="section-tag">Contacto</span>
+      <h1 class="section-title">
+        ¿Tienes un <span>Proyecto</span> en Mente?
+      </h1>
+      <p class="section-subtitle">
+        Estamos aquí para ayudarte a convertir tus ideas en realidad. 
+        Cuéntanos sobre tu proyecto y te contactaremos a la brevedad.
+      </p>
+    </div>
+
+    <div class="contact-wrapper">
+      <!-- Información de Contacto -->
+      <div class="contact-info">
+        <h2>Información de Contacto</h2>
+        <p class="info-description">
+          No dudes en contactarnos para cualquier consulta, sugerencia o 
+          colaboración. Estamos disponibles para ti.
+        </p>
+
+        <div class="info-grid">
+          <div class="info-item" *ngFor="let info of contactInfo">
+            <div class="info-icon">
+              <i [class]="info.icon"></i>
+            </div>
+            <div class="info-content">
+              <h4>{{ info.title }}</h4>
+              <p *ngFor="let detail of info.details">{{ detail }}</p>
+              <a *ngIf="info.action" [href]="info.action" target="_blank" class="info-link">
+                Contactar <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Redes Sociales -->
+        <div class="social-links">
+          <h4>Síguenos</h4>
+          <div class="social-icons">
+            <a href="#" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario -->
+      <div class="contact-form-wrapper">
+        <h2>Envíanos un Mensaje</h2>
+        
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
+          <!-- Nombre -->
+          <div class="form-group">
+            <label for="name">Nombre completo *</label>
+            <input 
+              type="text" 
+              id="name"
+              formControlName="name"
+              placeholder="Tu nombre completo"
+              class="form-control"
+              [class.is-invalid]="hasError('name')">
+            <div class="error-message" *ngIf="hasError('name')">
+              {{ getErrorMessage('name') }}
+            </div>
+          </div>
+
+          <!-- Email y Teléfono -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input 
+                type="email" 
+                id="email"
+                formControlName="email"
+                placeholder="tu@email.com"
+                class="form-control"
+                [class.is-invalid]="hasError('email')">
+              <div class="error-message" *ngIf="hasError('email')">
+                {{ getErrorMessage('email') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Teléfono</label>
+              <input 
+                type="tel" 
+                id="phone"
+                formControlName="phone"
+                placeholder="+34 900 123 456"
+                class="form-control"
+                [class.is-invalid]="hasError('phone')">
+              <div class="error-message" *ngIf="hasError('phone')">
+                {{ getErrorMessage('phone') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Asunto -->
+          <div class="form-group">
+            <label for="subject">Asunto *</label>
+            <input 
+              type="text" 
+              id="subject"
+              formControlName="subject"
+              placeholder="Asunto de tu mensaje"
+              class="form-control"
+              [class.is-invalid]="hasError('subject')">
+            <div class="error-message" *ngIf="hasError('subject')">
+              {{ getErrorMessage('subject') }}
+            </div>
+          </div>
+
+          <!-- Mensaje -->
+          <div class="form-group">
+            <label for="message">Mensaje *</label>
+            <textarea 
+              id="message"
+              formControlName="message"
+              placeholder="Cuéntanos sobre tu proyecto..."
+              class="form-control"
+              rows="5"
+              [class.is-invalid]="hasError('message')"></textarea>
+            <div class="error-message" *ngIf="hasError('message')">
+              {{ getErrorMessage('message') }}
+            </div>
+            <div class="char-counter" *ngIf="f['message'].value">
+              {{ f['message'].value.length }} / 500
+            </div>
+          </div>
+
+          <!-- Términos -->
+          <div class="form-check">
+            <input 
+              type="checkbox" 
+              id="acceptTerms"
+              formControlName="acceptTerms"
+              class="form-check-input"
+              [class.is-invalid]="hasError('acceptTerms')">
+            <label for="acceptTerms">
+              Acepto los <a href="#">términos y condiciones</a> y la 
+              <a href="#">política de privacidad</a> *
+            </label>
+            <div class="error-message" *ngIf="hasError('acceptTerms')">
+              Debes aceptar los términos para continuar
+            </div>
+          </div>
+
+          <!-- Botón -->
+          <button 
+            type="submit" 
+            class="btn-submit"
+            [disabled]="isSubmitting || isSubmitted">
+            <span *ngIf="!isSubmitting && !isSubmitted">
+              <i class="fas fa-paper-plane"></i> Enviar Mensaje
+            </span>
+            <span *ngIf="isSubmitting">
+              <i class="fas fa-spinner fa-spin"></i> Enviando...
+            </span>
+            <span *ngIf="isSubmitted && submitSuccess">
+              <i class="fas fa-check"></i> ¡Enviado!
+            </span>
+          </button>
+
+          <!-- Mensajes -->
+          <div *ngIf="submitSuccess" class="alert-success">
+            <i class="fas fa-check-circle"></i>
+            ¡Mensaje enviado con éxito! Te contactaremos pronto.
+          </div>
+
+          <div *ngIf="submitError" class="alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            Hubo un error al enviar el mensaje. Por favor, intenta de nuevo.
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

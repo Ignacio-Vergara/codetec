@@ -1,0 +1,212 @@
+// ============================================
+// VP SOLUTIONS - Estilos Globales
+// ============================================
+
+@import 'variables';
+@import 'mixins';
+
+// ---------- Reset y Base ----------
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: $font-family-body;
+  background-color: $bg-primary;
+  color: $text-primary;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+// ---------- Tipografías ----------
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-family-heading;
+  font-weight: 600;
+  line-height: 1.2;
+  color: $text-primary;
+}
+
+// ---------- Enlaces ----------
+a {
+  color: $primary;
+  text-decoration: none;
+  transition: color $transition-fast;
+  
+  &:hover {
+    color: $primary-hover;
+  }
+}
+
+// ---------- Scrollbar ----------
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $bg-primary;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $bg-secondary;
+  border-radius: $border-radius-sm;
+  
+  &:hover {
+    background: $primary;
+  }
+}
+
+// ---------- Utilidades ----------
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $spacing-lg;
+
+  @include respond-to(md) {
+    padding: 0 $spacing-md;
+  }
+
+  @include respond-to(xs) {
+    padding: 0 $spacing-sm;
+  }
+}
+
+.section-padding {
+  padding: $spacing-4xl 0;
+
+  @include respond-to(lg) {
+    padding: $spacing-3xl 0;
+  }
+
+  @include respond-to(md) {
+    padding: $spacing-2xl 0;
+  }
+}
+
+// ---------- Selección ----------
+::selection {
+  background: $primary;
+  color: $text-primary;
+}
+
+// ---------- Imágenes ----------
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// ---------- Código ----------
+code, pre {
+  font-family: $font-family-code;
+}
+
+// ---------- Botones Base ----------
+.btn-primary-custom {
+  display: inline-block;
+  padding: $spacing-sm $spacing-xl;
+  background: $primary;
+  color: $text-primary;
+  border: none;
+  border-radius: $border-radius-md;
+  font-family: $font-family-body;
+  font-weight: 500;
+  font-size: $font-size-base;
+  cursor: pointer;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: $primary-hover;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba($primary, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+
+  i {
+    margin-right: $spacing-sm;
+  }
+
+  @include respond-to(md) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.btn-outline-custom {
+  display: inline-block;
+  padding: $spacing-sm $spacing-xl;
+  background: transparent;
+  color: $text-primary;
+  border: 1px solid $bg-secondary;
+  border-radius: $border-radius-md;
+  font-family: $font-family-body;
+  font-weight: 500;
+  font-size: $font-size-base;
+  cursor: pointer;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: $bg-secondary;
+    border-color: $primary;
+    color: $primary;
+  }
+
+  i {
+    margin-right: $spacing-sm;
+  }
+
+  @include respond-to(md) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// ---------- Grid System ----------
+.grid-3 {
+  @include grid-responsive(3, $spacing-xl);
+}
+
+.grid-2 {
+  @include grid-responsive(2, $spacing-xl);
+}
+
+// ---------- Cards ----------
+.card-surface {
+  @include card-surface;
+  padding: $spacing-xl;
+}
+
+// ---------- Section Titles ----------
+.section-title {
+  @include section-title;
+}
+
+.section-subtitle {
+  @include section-subtitle;
+}
+
+// ============================================
+// OVERRIDES - Forzar grid 2 columnas
+// ============================================
+
+.applications-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 24px !important;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}

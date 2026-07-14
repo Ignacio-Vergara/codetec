@@ -1,0 +1,195 @@
+// ============================================
+// CODETEC - Estilos Footer
+// ============================================
+
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.footer {
+  position: relative;
+  z-index: 2;
+  background: rgba($bg-surface, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid rgba($bg-secondary, 0.3);
+  padding: $spacing-2xl 0 $spacing-lg;
+  margin-top: $spacing-3xl;
+
+  &-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 $spacing-lg;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: $spacing-2xl;
+
+    @include respond-to(lg) {
+      grid-template-columns: 1fr 1fr;
+      gap: $spacing-xl;
+    }
+
+    @include respond-to(md) {
+      grid-template-columns: 1fr;
+      gap: $spacing-lg;
+      text-align: center;
+    }
+  }
+
+  // ---------- Brand ----------
+  &-brand {
+    .footer-logo {
+      height: 40px;
+      width: auto;
+      display: block;
+      margin-bottom: $spacing-sm;
+
+      @include respond-to(md) {
+        margin: 0 auto $spacing-sm;
+      }
+    }
+
+    .brand-text {
+      font-family: $font-family-heading;
+      font-weight: 700;
+      font-size: $font-size-xl;
+      color: $text-primary;
+      display: block;
+    }
+
+    .brand-description {
+      color: $text-secondary;
+      font-size: $font-size-sm;
+      margin-top: $spacing-md;
+      max-width: 300px;
+      line-height: 1.6;
+
+      @include respond-to(md) {
+        max-width: 100%;
+      }
+    }
+  }
+
+  // ---------- Links ----------
+  &-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-xl;
+
+    @include respond-to(md) {
+      grid-template-columns: 1fr 1fr;
+      gap: $spacing-md;
+    }
+  }
+
+  .links-column {
+    h4 {
+      font-family: $font-family-heading;
+      font-size: $font-size-sm;
+      font-weight: 600;
+      color: $text-primary;
+      margin-bottom: $spacing-md;
+      letter-spacing: 0.5px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        margin-bottom: $spacing-sm;
+
+        a {
+          color: $text-secondary;
+          text-decoration: none;
+          font-size: $font-size-sm;
+          transition: all $transition-fast;
+
+          &:hover {
+            color: $primary;
+            padding-left: $spacing-xs;
+          }
+        }
+      }
+    }
+  }
+
+  // ---------- Social ----------
+  &-social {
+    h4 {
+      font-family: $font-family-heading;
+      font-size: $font-size-sm;
+      font-weight: 600;
+      color: $text-primary;
+      margin-bottom: $spacing-md;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .social-icons {
+    display: flex;
+    gap: $spacing-md;
+
+    @include respond-to(md) {
+      justify-content: center;
+    }
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: rgba($bg-primary, 0.5);
+      color: $text-secondary;
+      border-radius: 50%;
+      transition: all $transition-base;
+      text-decoration: none;
+      border: 1px solid rgba($bg-secondary, 0.3);
+
+      &:hover {
+        background: $primary;
+        color: $text-primary;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+      }
+
+      i {
+        font-size: $font-size-lg;
+      }
+    }
+  }
+
+  // ---------- Bottom ----------
+  &-bottom {
+    margin-top: $spacing-xl;
+    padding: $spacing-md 0;
+    border-top: 1px solid rgba($bg-secondary, 0.3);
+
+    .footer-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: $spacing-md;
+
+      @include respond-to(md) {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    p {
+      color: $text-secondary;
+      font-size: $font-size-sm;
+      margin: 0;
+
+      &.tech-stack {
+        color: $text-secondary;
+        
+        i {
+          margin: 0 $spacing-xs;
+        }
+      }
+    }
+  }
+}

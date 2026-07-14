@@ -1,0 +1,17 @@
+# ============================================
+# VP SOLUTIONS - Backend Dependencies
+# ============================================
+
+# Framework
+flask==3.0.0
+flask-cors==4.0.0
+
+# Validaciones y utilidades
+python-dotenv==1.0.0
+email-validator==2.1.0
+
+# Para Vercel Serverless
+python-multipart==0.0.6
+
+# Desarrollo
+flask-dev==0.1.0

@@ -1,0 +1,552 @@
+// ============================================
+// VP SOLUTIONS - Estilos Home
+// ============================================
+
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+// ---------- Hero ----------
+.hero {
+  min-height: 100vh;
+  @include flex-center;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba($primary, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  &-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-3xl;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+
+    .hero-text {
+      min-width: 0;
+    }
+
+    @include respond-to(lg) {
+      grid-template-columns: 1fr;
+      gap: $spacing-2xl;
+      text-align: center;
+    }
+  }
+
+  &-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-sm;
+    background: rgba($primary, 0.1);
+    color: $accent;
+    padding: $spacing-xs $spacing-lg;
+    border-radius: 20px;
+    font-size: $font-size-sm;
+    font-weight: 500;
+    border: 1px solid rgba($accent, 0.2);
+    margin-bottom: $spacing-lg;
+
+    i {
+      font-size: $font-size-sm;
+    }
+  }
+
+  &-title {
+    font-size: $font-size-5xl;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: $spacing-lg;
+    text-wrap: balance;
+
+    span {
+      @include gradient-text;
+    }
+
+    @include respond-to(md) {
+      font-size: $font-size-4xl;
+    }
+  }
+
+  &-description {
+    font-size: $font-size-lg;
+    color: $text-secondary;
+    max-width: 500px;
+    line-height: 1.8;
+    margin-bottom: $spacing-xl;
+
+    @include respond-to(sm) {
+      max-width: 100%;
+    }
+  }
+
+  &-actions {
+    display: flex;
+    gap: $spacing-md;
+    flex-wrap: wrap;
+
+    @include respond-to(lg) {
+      justify-content: center;
+    }
+
+    .btn-primary-custom, .btn-outline-custom {
+      min-width: 0;
+
+      i {
+        margin-right: $spacing-sm;
+      }
+    }
+  }
+
+  // ---------- Hero Visual (Code) ----------
+  &-visual {
+    @include flex-center;
+
+    @include respond-to(lg) {
+      order: -1;
+    }
+  }
+
+  &-code {
+    background: $bg-surface;
+    border: 1px solid $bg-secondary;
+    border-radius: $border-radius-lg;
+    padding: $spacing-xl;
+    font-family: $font-family-code;
+    font-size: $font-size-sm;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+
+    .code-line {
+      padding: $spacing-xs 0;
+      opacity: 0;
+      animation: codeAppear 0.5s ease forwards;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+
+      @for $i from 1 through 4 {
+        &:nth-child(#{$i}) {
+          animation-delay: $i * 0.2s;
+        }
+      }
+
+      &.cursor-blink::after {
+        content: '|';
+        animation: blink 1s step-end infinite;
+      }
+    }
+
+    .code-keyword { color: #FF6B6B; }
+    .code-bracket { color: #F5F7FA; }
+    .code-class { color: #4ECDC4; }
+    .code-string { color: #FFE66D; }
+    .code-variable { color: #A8E6CF; }
+    .code-operator { color: #FF6B6B; }
+    .code-method { color: #4ECDC4; }
+    .code-comment { color: $text-secondary; font-style: italic; }
+  }
+
+  @include respond-to(md) {
+    min-height: auto;
+    padding-top: $spacing-2xl;
+    padding-bottom: $spacing-2xl;
+
+    &::before {
+      width: 420px;
+      height: 420px;
+      right: -35%;
+      top: -35%;
+    }
+
+    &-content {
+      gap: $spacing-xl;
+    }
+
+    &-badge {
+      margin-bottom: $spacing-md;
+    }
+
+    &-title {
+      font-size: clamp(2rem, 8vw, $font-size-4xl);
+      line-height: 1.08;
+
+      br {
+        display: none;
+      }
+    }
+
+    &-description {
+      max-width: 100%;
+      font-size: $font-size-base;
+      line-height: 1.65;
+      margin-bottom: $spacing-lg;
+    }
+
+    &-actions {
+      flex-direction: column;
+      align-items: stretch;
+      gap: $spacing-sm;
+
+      .btn-primary-custom,
+      .btn-outline-custom {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+        white-space: normal;
+      }
+    }
+
+    &-visual {
+      width: 100%;
+    }
+
+    &-code {
+      max-width: 100%;
+      padding: $spacing-lg;
+      font-size: $font-size-xs;
+    }
+  }
+
+  @include respond-to(xs) {
+    &::before {
+      display: none;
+    }
+
+    &-content {
+      gap: $spacing-lg;
+    }
+
+    &-badge {
+      font-size: 0.7rem;
+      padding: 0.35rem 0.9rem;
+    }
+
+    &-title {
+      font-size: 1.9rem;
+      line-height: 1.06;
+    }
+
+    &-description {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: $spacing-md;
+    }
+
+    &-code {
+      padding: $spacing-md;
+
+      .code-line {
+        padding: 2px 0;
+      }
+    }
+  }
+}
+
+// ---------- Stats ----------
+.stats {
+  background: $bg-surface;
+  border-top: 1px solid $bg-secondary;
+  border-bottom: 1px solid $bg-secondary;
+
+  &-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $spacing-xl;
+
+    @include respond-to(md) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: $spacing-lg;
+    }
+  }
+
+  .stat-item {
+    text-align: center;
+
+    .stat-value {
+      display: block;
+      font-family: $font-family-heading;
+      font-size: $font-size-4xl;
+      font-weight: 700;
+      @include gradient-text;
+    }
+
+    .stat-label {
+      display: block;
+      color: $text-secondary;
+      font-size: $font-size-sm;
+      margin-top: $spacing-xs;
+    }
+  }
+}
+
+// ---------- About ----------
+.about {
+  &-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-3xl;
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  &-text {
+    text-align: center;
+
+    .section-tag {
+      display: inline-block;
+      color: $accent;
+      font-family: $font-family-code;
+      font-size: $font-size-sm;
+      background: rgba($accent, 0.1);
+      padding: $spacing-xs $spacing-lg;
+      border-radius: 20px;
+      border: 1px solid rgba($accent, 0.2);
+      margin-bottom: $spacing-md;
+    }
+
+    .section-title {
+      font-size: $font-size-4xl;
+      margin-bottom: $spacing-lg;
+
+      span {
+        @include gradient-text;
+      }
+    }
+  }
+
+  &-description {
+    color: $text-secondary;
+    font-size: $font-size-lg;
+    line-height: 1.8;
+    margin-bottom: $spacing-xl;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  &-features {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $spacing-lg;
+    margin-top: $spacing-xl;
+
+    @include respond-to(lg) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include respond-to(md) {
+      grid-template-columns: 1fr;
+    }
+
+    .feature {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: $spacing-md;
+      padding: $spacing-xl;
+      background: $bg-surface;
+      border: 1px solid $bg-secondary;
+      border-radius: $border-radius-lg;
+      transition: all $transition-base;
+
+      &:hover {
+        border-color: $primary;
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba($primary, 0.1);
+      }
+
+      i {
+        font-size: $font-size-3xl;
+        color: $primary;
+      }
+
+      h4 {
+        font-family: $font-family-heading;
+        font-size: $font-size-base;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      p {
+        color: $text-secondary;
+        font-size: $font-size-sm;
+        margin: 0;
+        line-height: 1.6;
+      }
+    }
+  }
+}
+
+// ---------- Technologies (Slider Constante) ----------
+.technologies {
+  background: $bg-surface;
+  padding-bottom: 0;
+
+  .section-header {
+    text-align: center;
+    margin-bottom: $spacing-2xl;
+
+    .section-tag {
+      display: inline-block;
+      color: $accent;
+      font-family: $font-family-code;
+      font-size: $font-size-sm;
+      background: rgba($accent, 0.1);
+      padding: $spacing-xs $spacing-lg;
+      border-radius: 20px;
+      border: 1px solid rgba($accent, 0.2);
+      margin-bottom: $spacing-md;
+    }
+
+    .section-title {
+      font-size: $font-size-4xl;
+      margin-bottom: $spacing-md;
+
+      span {
+        @include gradient-text;
+      }
+    }
+
+    .section-subtitle {
+      color: $text-secondary;
+      font-size: $font-size-lg;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.8;
+    }
+  }
+}
+
+// ---------- Slider Full Width - Movimiento Constante ----------
+.tech-slider-wrapper {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  overflow: hidden;
+  background: $bg-primary;
+  padding: $spacing-2xl 0;
+  border-top: 1px solid $bg-secondary;
+  border-bottom: 1px solid $bg-secondary;
+}
+
+.tech-slider-container {
+  width: 100%;
+  overflow: visible;
+  padding: 0 20px;
+}
+
+.tech-slider {
+  display: flex;
+  gap: 24px;
+  transition: none; /* Sin transición para movimiento constante */
+  will-change: transform;
+  width: max-content;
+}
+
+.tech-item {
+  flex: 0 0 auto;
+  width: 200px;
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-lg;
+  background: $bg-surface;
+  border: 1px solid $bg-secondary;
+  border-radius: $border-radius-md;
+  transition: all $transition-base;
+  text-align: center;
+  min-height: 140px;
+
+  @include respond-to(md) {
+    width: 160px;
+    min-height: 120px;
+    padding: $spacing-md;
+  }
+
+  @include respond-to(sm) {
+    width: 130px;
+    min-height: 100px;
+    padding: $spacing-sm;
+  }
+
+  &:hover {
+    border-color: $primary;
+    transform: translateY(-4px);
+    box-shadow: 0 4px 20px rgba($primary, 0.1);
+    background: rgba($primary, 0.05);
+
+    .tech-icon {
+      transform: scale(1.1);
+    }
+  }
+
+  .tech-icon {
+    font-size: $font-size-3xl;
+    transition: transform $transition-base;
+
+    i {
+      font-size: 2.5rem;
+
+      @include respond-to(sm) {
+        font-size: 2rem;
+      }
+    }
+  }
+
+  .tech-name {
+    font-size: $font-size-sm;
+    font-weight: 500;
+    color: $text-primary;
+
+    @include respond-to(sm) {
+      font-size: $font-size-xs;
+    }
+  }
+
+  .tech-category {
+    font-size: $font-size-xs;
+    color: $text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    @include respond-to(sm) {
+      font-size: 0.6rem;
+    }
+  }
+}
+
+// ---------- Animaciones ----------
+@keyframes codeAppear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}

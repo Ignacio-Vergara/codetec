@@ -1,0 +1,54 @@
+<!-- ============================================
+CODETEC - Navbar
+============================================ -->
+
+<nav class="navbar" [class.scrolled]="isScrolled">
+  <div class="navbar-container">
+    <!-- Columna 1: Botón Hamburguesa -->
+    <div class="navbar-col navbar-col-left">
+      <button class="navbar-toggler" 
+              (click)="toggleMenu()" 
+              [class.active]="isMenuOpen"
+              aria-label="Toggle navigation">
+        <span class="toggler-icon"></span>
+        <span class="toggler-icon"></span>
+        <span class="toggler-icon"></span>
+      </button>
+    </div>
+
+    <!-- Columna 2: Logo + Nombre (centrado) -->
+    <div class="navbar-col navbar-col-center">
+      <a class="navbar-brand" routerLink="/" (click)="closeMenu()">
+        <img src="assets/images/logo-codetec.png" alt="Codetec" class="logo-img">
+        <span class="logo-text">Codetec</span>
+      </a>
+    </div>
+
+    <!-- Columna 3: Vacía (para futuros elementos) -->
+    <div class="navbar-col navbar-col-right">
+      <!-- Espacio reservado para futuros elementos -->
+    </div>
+  </div>
+</nav>
+
+<!-- Sidebar Flotante (visible en móvil) -->
+<div class="sidebar-overlay" [class.open]="isMenuOpen" (click)="closeMenu()"></div>
+<div class="sidebar" [class.open]="isMenuOpen">
+  <div class="sidebar-header">
+    <img src="assets/images/logo-codetec.png" alt="Codetec" class="sidebar-logo">
+    <button class="sidebar-close" (click)="closeMenu()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+  <ul class="sidebar-nav">
+    <li class="sidebar-nav-item" *ngFor="let item of navItems">
+      <a class="sidebar-nav-link" 
+         routerLink="{{ item.route }}" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: true}"
+         (click)="closeMenu()">
+        {{ item.label }}
+      </a>
+    </li>
+  </ul>
+</div>

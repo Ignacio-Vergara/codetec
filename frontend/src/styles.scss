@@ -1,0 +1,15 @@
+// ============================================
+// VP SOLUTIONS - Punto de Entrada de Estilos
+// ============================================
+
+// 1. Bootstrap (primero para poder sobrescribir)
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+// 2. Variables y Mixins (para usar en toda la app)
+@import 'styles/variables';
+@import 'styles/mixins';
+
+// 3. Estilos Globales
+@import 'styles/global';
+
+// 4. Estilos de Componentes (se importan desde los componentes)

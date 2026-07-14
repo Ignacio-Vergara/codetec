@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Gestión</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--gray-50); color: var(--gray-700); }
+
+    /* ─── CSS Variables ─────────────────────────────────────── */
+    :root {
+      --primary-green: #1b8000;
+      --primary-green-dark: #146300;
+      --primary-green-light: #2a9d00;
+      --primary-yellow: #f7c620;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --info: #3b82f6;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / .05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 20px;
+      --transition-fast: 150ms ease;
+      --transition-base: 250ms ease;
+      --sidebar-width: 280px;
+      --sidebar-collapsed: 72px;
+    }
+
+    /* ─── Scrollbar ─────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--gray-100); }
+    ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+
+    /* ─── Utility ───────────────────────────────────────────── */
+    .hidden { display: none !important; }
+    .fade-in { animation: fadeIn .3s ease-out; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes slideOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
+
+    /* ════════════════════════════════════════════════════════
+       APP SHELL
+    ════════════════════════════════════════════════════════ */
+    #app-shell { display:flex; min-height:100vh; }
+
+    /* ─── Sidebar ─────────────────────────────────────────── */
+    .sidebar {
+      position: fixed; left:0; top:0; bottom:0;
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, var(--gray-900) 0%, #0f172a 100%);
+      color: white;
+      display: flex; flex-direction:column;
+      transition: width var(--transition-base);
+      z-index: 100;
+      box-shadow: var(--shadow-xl);
+    }
+    .sidebar.collapsed { width: var(--sidebar-collapsed); }
+    .sidebar-header {
+      padding:1.5rem; display:flex; align-items:center; gap:.75rem;
+      border-bottom:1px solid rgba(255,255,255,.1);
+    }
+    .logo-icon-sidebar {
+      background: linear-gradient(135deg, var(--primary-green), var(--primary-yellow));
+      width:36px; height:36px; min-width:36px;
+      display:flex; align-items:center; justify-content:center;
+      border-radius:var(--radius-md); font-size:1.1rem; font-weight:800; color:white;
+    }
+    .logo-text-sidebar { font-size:1.4rem; font-weight:800; color:white; letter-spacing:-.5px; white-space:nowrap; overflow:hidden; transition:opacity var(--transition-base),width var(--transition-base); }
+    .sidebar.collapsed .logo-text-sidebar { opacity:0; width:0; }
+    .sidebar-nav { flex:1; padding:1.25rem .875rem; display:flex; flex-direction:column; gap:.375rem; overflow-y:auto; }
+    .nav-item {
+      display:flex; align-items:center; gap:.75rem; padding:.7rem .875rem;
+      border-radius:var(--radius-md); color:var(--gray-300); text-decoration:none;
+      transition:all var(--transition-fast); cursor:pointer; border:none; background:transparent; width:100%; text-align:left;
+    }
+    .nav-item:hover { background:rgba(255,255,255,.1); color:white; }
+    .nav-item.active { background:var(--primary-green); color:white; box-shadow:var(--shadow-md); }
+    .nav-icon { font-size:1.2rem; min-width:24px; text-align:center; }
+    .nav-content { flex:1; overflow:hidden; transition:opacity var(--transition-base); }
+    .nav-label { display:block; font-size:.875rem; font-weight:500; white-space:nowrap; }
+    .nav-desc { display:block; font-size:.68rem; opacity:.65; margin-top:.1rem; white-space:nowrap; }
+    .sidebar.collapsed .nav-content { opacity:0; width:0; overflow:hidden; }
+    .sidebar.collapsed .nav-item { justify-content:center; padding:.7rem; }
+    .sidebar-footer { padding:1rem; border-top:1px solid rgba(255,255,255,.1); }
+    .user-info { display:flex; align-items:center; gap:.75rem; margin-bottom:.875rem; overflow:hidden; }
+    .user-avatar {
+      width:40px; height:40px; min-width:40px;
+      background:linear-gradient(135deg,var(--primary-green),var(--primary-yellow));
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:1rem; color:white;
+    }
+    .user-details { overflow:hidden; transition:opacity var(--transition-base); }
+    .user-name { display:block; font-size:.875rem; font-weight:600; color:white; white-space:nowrap; }
+    .user-role-badge { display:block; font-size:.7rem; color:var(--gray-400); white-space:nowrap; }
+    .sidebar.collapsed .user-details { opacity:0; width:0; overflow:hidden; }
+    .logout-btn {
+      width:100%; display:flex; align-items:center; gap:.75rem; padding:.7rem .875rem;
+      background:rgba(239,68,68,.2); border:none; border-radius:var(--radius-md);
+      color:#fca5a5; cursor:pointer; transition:all var(--transition-fast);
+    }
+    .logout-btn:hover { background:rgba(239,68,68,.3); color:#fecaca; }
+    .sidebar.collapsed .logout-btn { justify-content:center; }
+    .sidebar.collapsed .logout-label { display:none; }
+
+    /* ─── Main Content ─────────────────────────────────────── */
+    .main-content {
+      flex:1; display:flex; flex-direction:column;
+      margin-left: var(--sidebar-width);
+      transition: margin-left var(--transition-base);
+      min-width:0;
+    }
+    #app-shell.sidebar-collapsed .main-content { margin-left: var(--sidebar-collapsed); }
+
+    /* ─── Topbar ───────────────────────────────────────────── */
+    .topbar {
+      background:white; padding:.75rem 1.5rem;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid var(--gray-200); box-shadow:var(--shadow-sm);
+      position:sticky; top:0; z-index:99;
+    }
+    .topbar-left { display:flex; align-items:center; gap:1rem; }
+    .menu-toggle {
+      background:transparent; border:none; cursor:pointer; padding:.5rem;
+      border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center;
+      transition:all var(--transition-fast); color:var(--gray-600);
+    }
+    .menu-toggle:hover { background:var(--gray-100); }
+    .breadcrumbs { display:flex; align-items:center; gap:.5rem; font-size:.875rem; }
+    .breadcrumb-current { color:var(--gray-900); font-weight:500; }
+    .topbar-right { display:flex; align-items:center; gap:1rem; }
+    .icon-btn {
+      background:transparent; border:none; cursor:pointer; padding:.5rem;
+      border-radius:var(--radius-md); position:relative; transition:all var(--transition-fast); color:var(--gray-600);
+    }
+    .icon-btn:hover { background:var(--gray-100); }
+    .badge {
+      position:absolute; top:0; right:0;
+      background:var(--error); color:white; font-size:.6rem;
+      padding:.1rem .35rem; border-radius:10px; font-weight:700;
+    }
+    .topbar-user { display:flex; align-items:center; gap:.75rem; cursor:pointer; padding:.4rem .6rem; border-radius:var(--radius-md); transition:all var(--transition-fast); }
+    .topbar-user:hover { background:var(--gray-100); }
+    .topbar-user-avatar {
+      width:34px; height:34px;
+      background:linear-gradient(135deg,var(--primary-green),var(--primary-yellow));
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:.85rem; color:white;
+    }
+    .topbar-user-info .tu-name { display:block; font-size:.875rem; font-weight:600; color:var(--gray-900); }
+    .topbar-user-info .tu-role { display:block; font-size:.72rem; color:var(--gray-500); }
+
+    /* ─── Content Wrapper ─────────────────────────────────── */
+    .content-wrapper { padding:1.5rem; flex:1; }
+
+    /* ════════════════════════════════════════════════════════
+       DASHBOARD
+    ════════════════════════════════════════════════════════ */
+    #view-dashboard { display:none; }
+    #view-dashboard.active { display:block; animation:fadeIn .3s ease-out; }
+
+    .dashboard-header { text-align:center; margin-bottom:2.25rem; }
+    .dashboard-header h1 { font-size:1.875rem; font-weight:700; color:var(--gray-900); margin-bottom:.4rem; }
+    .dashboard-header p { color:var(--gray-500); font-size:.875rem; }
+
+    .section-title { font-size:1.15rem; font-weight:600; color:var(--gray-800); margin-bottom:1.4rem; display:flex; align-items:center; gap:.5rem; }
+
+    .modules-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.4rem; margin-bottom:2rem; }
+    .module-card {
+      background:white; border-radius:var(--radius-lg); padding:1.4rem;
+      display:flex; gap:1rem; box-shadow:var(--shadow-sm);
+      transition:all var(--transition-base); cursor:pointer;
+    }
+    .module-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
+    .module-icon {
+      width:54px; height:54px; min-width:54px; border-radius:var(--radius-md);
+      display:flex; align-items:center; justify-content:center; font-size:1.7rem;
+    }
+    .module-card.green .module-icon { background:rgba(27,128,0,.1); color:var(--primary-green); }
+    .module-card.blue .module-icon { background:rgba(59,130,246,.1); color:#3b82f6; }
+    .module-card.purple .module-icon { background:rgba(139,92,246,.1); color:#8b5cf6; }
+    .module-card.orange .module-icon { background:rgba(245,158,11,.1); color:#f59e0b; }
+    .module-card.teal .module-icon { background:rgba(20,184,166,.1); color:#14b8a6; }
+    .module-card.gray .module-icon { background:rgba(107,114,128,.1); color:#6b7280; }
+    .module-content h3 { font-size:1.05rem; font-weight:600; color:var(--gray-900); margin-bottom:.4rem; }
+    .module-content p { font-size:.82rem; color:var(--gray-500); line-height:1.45; margin-bottom:.9rem; }
+    .module-btn {
+      background:transparent; border:none; color:var(--primary-green);
+      font-size:.82rem; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:.25rem; padding:0;
+      transition:gap var(--transition-fast);
+    }
+    .module-btn:hover .arrow { transform:translateX(4px); }
+    .arrow { display:inline-block; transition:transform var(--transition-fast); }
+
+    /* ════════════════════════════════════════════════════════
+       PURCHASE LIST
+    ════════════════════════════════════════════════════════ */
+    #view-purchase-list { display:none; }
+    #view-purchase-list.active { display:block; animation:fadeIn .3s ease-out; }
+
+    .page-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.75rem; }
+    .page-header h1 { font-size:1.75rem; font-weight:700; color:var(--gray-900); margin-bottom:.3rem; }
+    .page-header p { color:var(--gray-500); font-size:.875rem; }
+    .btn-primary {
+      padding:.625rem 1.4rem; background:var(--primary-green); color:white;
+      border:none; border-radius:var(--radius-md); font-size:.875rem; font-weight:500;
+      cursor:pointer; transition:all var(--transition-fast); white-space:nowrap;
+    }
+    .btn-primary:hover { background:var(--primary-green-dark); transform:translateY(-1px); box-shadow:var(--shadow-md); }
+
+    /* Filters */
+    .filters-container { background:white; border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:1.4rem; }
+    .search-bar { display:flex; align-items:center; padding:1rem; gap:1rem; border-bottom:1px solid var(--gray-200); }
+    .search-input-wrapper { flex:1; position:relative; }
+    .search-icon { position:absolute; left:.9rem; top:50%; transform:translateY(-50%); font-size:.95rem; }
+    .search-input {
+      width:100%; padding:.6rem 1rem .6rem 2.4rem;
+      border:1.5px solid var(--gray-200); border-radius:var(--radius-md);
+      font-size:.875rem; transition:all var(--transition-fast); font-family:inherit;
+    }
+    .search-input:focus { outline:none; border-color:var(--primary-green); box-shadow:0 0 0 3px rgba(27,128,0,.1); }
+    .filter-toggle {
+      display:flex; align-items:center; gap:.5rem; padding:.6rem 1rem;
+      background:var(--gray-100); border:none; border-radius:var(--radius-md);
+      font-size:.875rem; cursor:pointer; transition:all var(--transition-fast); font-family:inherit; white-space:nowrap;
+    }
+    .filter-toggle:hover { background:var(--gray-200); }
+    .filters-panel { max-height:0; opacity:0; overflow:hidden; transition:all var(--transition-base); }
+    .filters-panel.expanded { max-height:300px; opacity:1; padding:1.5rem; }
+    .filters-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1rem; }
+    .filter-group { display:flex; flex-direction:column; }
+    .filter-group label { font-size:.72rem; font-weight:500; color:var(--gray-600); margin-bottom:.25rem; }
+    .filter-group input, .filter-group select {
+      padding:.45rem .7rem; border:1px solid var(--gray-200); border-radius:var(--radius-md); font-size:.875rem; font-family:inherit;
+    }
+    .filter-group input:focus, .filter-group select:focus { outline:none; border-color:var(--primary-green); }
+    .filter-actions { display:flex; justify-content:flex-end; }
+    .clear-filters { padding:.45rem 1rem; background:transparent; border:none; color:var(--primary-green); font-size:.875rem; cursor:pointer; font-family:inherit; }
+    .clear-filters:hover { text-decoration:underline; }
+
+    /* Table */
+    .table-section { background:white; border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; }
+    .table-responsive { overflow-x:auto; }
+    .compact-table { width:100%; border-collapse:collapse; }
+    .compact-table thead { background:var(--gray-50); border-bottom:1px solid var(--gray-200); }
+    .compact-table thead th { text-align:left; padding:.875rem 1rem; font-size:.72rem; font-weight:600; color:var(--gray-600); text-transform:uppercase; letter-spacing:.05em; }
+    .compact-table tbody tr { border-bottom:1px solid var(--gray-100); transition:all var(--transition-fast); cursor:pointer; }
+    .compact-table tbody tr:last-child { border-bottom:none; }
+    .compact-table tbody tr:hover { background:var(--gray-50); }
+    .compact-table tbody td { padding:.875rem 1rem; font-size:.875rem; color:var(--gray-700); }
+    .empresa-info { display:flex; align-items:center; gap:.6rem; }
+    .empresa-icon { font-size:1.15rem; }
+    .empresa-name { font-weight:500; color:var(--gray-900); }
+    .phone-cell { font-family:monospace; font-size:.8rem; }
+    .status-badge { display:inline-block; padding:.2rem .6rem; border-radius:var(--radius-sm); font-size:.68rem; font-weight:600; }
+    .status-activo { background:rgba(16,185,129,.1); color:#10b981; }
+    .status-inactivo { background:rgba(239,68,68,.1); color:#ef4444; }
+    .status-pendiente { background:rgba(245,158,11,.1); color:#f59e0b; }
+    .status-revision { background:rgba(59,130,246,.1); color:#3b82f6; }
+    .actions-header { text-align:center; width:80px; }
+    .actions-cell { text-align:center; white-space:nowrap; }
+    .action-btn { background:transparent; border:none; cursor:pointer; padding:.25rem .45rem; font-size:.95rem; border-radius:var(--radius-sm); transition:all var(--transition-fast); }
+    .action-btn.edit:hover { background:rgba(59,130,246,.1); transform:scale(1.1); }
+    .action-btn.delete:hover { background:rgba(239,68,68,.1); transform:scale(1.1); }
+    .records-count { margin-top:.75rem; text-align:right; font-size:.82rem; color:var(--gray-500); }
+
+    /* ════════════════════════════════════════════════════════
+       PURCHASE FORM
+    ════════════════════════════════════════════════════════ */
+    #view-purchase-form { display:none; }
+    #view-purchase-form.active { display:block; animation:fadeIn .3s ease-out; }
+
+    .form-header { margin-bottom:1.75rem; }
+    .form-header h1 { font-size:1.75rem; font-weight:700; color:var(--gray-900); margin-bottom:.3rem; }
+    .form-header p { color:var(--gray-500); font-size:.875rem; }
+    .material-form { background:white; border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:2rem; }
+    .form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.4rem; }
+    .fg { display:flex; flex-direction:column; }
+    .fg label { font-size:.875rem; font-weight:500; color:var(--gray-700); margin-bottom:.4rem; }
+    .fg input, .fg select, .fg textarea {
+      padding:.6rem .875rem; border:1.5px solid var(--gray-200); border-radius:var(--radius-md);
+      font-size:.875rem; transition:all var(--transition-fast); font-family:inherit;
+    }
+    .fg input:focus, .fg select:focus, .fg textarea:focus { outline:none; border-color:var(--primary-green); box-shadow:0 0 0 3px rgba(27,128,0,.1); }
+    .fg textarea { resize:vertical; min-height:80px; }
+    .field-hint { font-size:.72rem; color:var(--gray-400); margin-top:.2rem; }
+    .full-width { grid-column:span 2; }
+    .form-actions { display:flex; justify-content:flex-end; gap:1rem; margin-top:1.75rem; padding-top:1.4rem; border-top:1px solid var(--gray-200); }
+    .btn-secondary {
+      padding:.625rem 1.4rem; background:white; color:var(--gray-700);
+      border:1px solid var(--gray-300); border-radius:var(--radius-md);
+      font-size:.875rem; font-weight:500; cursor:pointer; transition:all var(--transition-fast); font-family:inherit;
+    }
+    .btn-secondary:hover { background:var(--gray-50); border-color:var(--gray-400); }
+
+    /* ════════════════════════════════════════════════════════
+       DETAIL DRAWER
+    ════════════════════════════════════════════════════════ */
+    .drawer-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:200;
+      opacity:0; visibility:hidden; transition:all var(--transition-base);
+    }
+    .drawer-overlay.open { opacity:1; visibility:visible; }
+    .drawer {
+      position:fixed; top:0; right:0; bottom:0; width:460px; max-width:95vw;
+      background:white; z-index:201; box-shadow:var(--shadow-xl);
+      display:flex; flex-direction:column;
+      transform:translateX(100%); transition:transform var(--transition-base);
+    }
+    .drawer-overlay.open .drawer { transform:translateX(0); }
+    .drawer-header {
+      padding:1.4rem 1.5rem; border-bottom:1px solid var(--gray-200);
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .drawer-header h3 { font-size:1.1rem; font-weight:600; color:var(--gray-900); }
+    .drawer-close {
+      background:transparent; border:none; cursor:pointer; padding:.4rem;
+      border-radius:var(--radius-md); color:var(--gray-500); font-size:1.25rem;
+      transition:all var(--transition-fast);
+    }
+    .drawer-close:hover { background:var(--gray-100); color:var(--gray-900); }
+    .drawer-body { flex:1; overflow-y:auto; padding:1.5rem; }
+    .detail-section { margin-bottom:1.75rem; }
+    .detail-section h4 { font-size:.8rem; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:.06em; margin-bottom:1rem; }
+    .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .detail-item {}
+    .detail-label { font-size:.75rem; color:var(--gray-500); margin-bottom:.2rem; }
+    .detail-value { font-size:.875rem; font-weight:500; color:var(--gray-900); }
+    .detail-value.full { grid-column:span 2; }
+    .detail-status { margin-top:.5rem; }
+    .drawer-footer {
+      padding:1rem 1.5rem; border-top:1px solid var(--gray-200);
+      display:flex; gap:.75rem; justify-content:flex-end;
+    }
+    .btn-danger {
+      padding:.55rem 1.2rem; background:rgba(239,68,68,.1); color:var(--error);
+      border:1px solid rgba(239,68,68,.3); border-radius:var(--radius-md);
+      font-size:.875rem; font-weight:500; cursor:pointer; transition:all var(--transition-fast); font-family:inherit;
+    }
+    .btn-danger:hover { background:rgba(239,68,68,.2); }
+
+    /* ════════════════════════════════════════════════════════
+       TOAST
+    ════════════════════════════════════════════════════════ */
+    .toast-container { position:fixed; bottom:1.5rem; right:1.5rem; z-index:999; display:flex; flex-direction:column; gap:.6rem; }
+    .toast {
+      display:flex; align-items:center; gap:.75rem; padding:.875rem 1.25rem;
+      background:white; border-radius:var(--radius-md); box-shadow:var(--shadow-lg);
+      font-size:.875rem; min-width:280px; max-width:380px;
+      border-left:4px solid var(--success); animation:slideIn .3s ease-out;
+    }
+    .toast.warning { border-left-color:var(--warning); }
+    .toast.error { border-left-color:var(--error); }
+    .toast-icon { font-size:1.1rem; }
+    .toast-msg { flex:1; color:var(--gray-800); font-weight:500; }
+
+    /* ════════════════════════════════════════════════════════
+       COMING SOON VIEWS
+    ════════════════════════════════════════════════════════ */
+    #view-coming { display:none; }
+    #view-coming.active { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; animation:fadeIn .3s ease-out; }
+    .coming-icon { font-size:4rem; margin-bottom:1.5rem; opacity:.6; }
+    .coming-title { font-size:1.5rem; font-weight:700; color:var(--gray-800); margin-bottom:.5rem; }
+    .coming-sub { font-size:.9rem; color:var(--gray-500); }
+
+    /* ─── Responsive ──────────────────────────────────────── */
+    @media (max-width:768px) {
+      .sidebar { width: var(--sidebar-collapsed); }
+      .sidebar .nav-content, .sidebar .logo-text-sidebar, .sidebar .user-details, .sidebar .logout-label { display:none; }
+      .sidebar .nav-item { justify-content:center; padding:.7rem; }
+      .sidebar .logout-btn { justify-content:center; }
+      .main-content { margin-left: var(--sidebar-collapsed) !important; }
+      #app-shell.sidebar-collapsed .main-content { margin-left: var(--sidebar-collapsed); }
+      .content-wrapper { padding:1rem; }
+      .filters-grid { grid-template-columns:1fr; }
+      .form-grid { grid-template-columns:1fr; }
+      .full-width { grid-column:span 1; }
+      .modules-grid { grid-template-columns:1fr; }
+      .page-header { flex-direction:column; gap:1rem; }
+      .detail-grid { grid-template-columns:1fr; }
+      .detail-value.full { grid-column:span 1; }
+      .drawer { width:100vw; }
+      .topbar { padding:.75rem 1rem; }
+      .topbar-user-info { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ╔══════════════════════════════════════════════╗
+     ║             APP SHELL                       ║
+     ╚══════════════════════════════════════════════╝ -->
+<div id="app-shell">
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon-sidebar">🏗️</div>
+      <span class="logo-text-sidebar">Sistema de Gestión</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="navigate('dashboard',this)">
+        <span class="nav-icon">🏠</span>
+        <div class="nav-content"><span class="nav-label">Dashboard</span><span class="nav-desc">Inicio del sistema</span></div>
+      </button>
+      <button class="nav-item" onclick="navigate('purchase-list',this)">
+        <span class="nav-icon">🛒</span>
+        <div class="nav-content"><span class="nav-label">Compra Materiales</span><span class="nav-desc">Proveedores y materiales</span></div>
+      </button>
+      <button class="nav-item" onclick="navigate('coming',this,'Ventas')">
+        <span class="nav-icon">📈</span>
+        <div class="nav-content"><span class="nav-label">Ventas</span><span class="nav-desc">Gestión de clientes</span></div>
+      </button>
+      <button class="nav-item" onclick="navigate('coming',this,'Ingeniería')">
+        <span class="nav-icon">⚙️</span>
+        <div class="nav-content"><span class="nav-label">Ingeniería</span><span class="nav-desc">Proyectos y documentación</span></div>
+      </button>
+      <button class="nav-item" onclick="navigate('coming',this,'Supervisión')">
+        <span class="nav-icon">🔍</span>
+        <div class="nav-content"><span class="nav-label">Supervisión</span><span class="nav-desc">Control de calidad</span></div>
+      </button>
+      <button class="nav-item" onclick="navigate('coming',this,'Contabilidad')">
+        <span class="nav-icon">💰</span>
+        <div class="nav-content"><span class="nav-label">Contabilidad</span><span class="nav-desc">Finanzas y pagos</span></div>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-avatar">A</div>
+        <div class="user-details">
+          <span class="user-name" id="sidebar-name">Carlos Mendoza</span>
+          <span class="user-role-badge" id="sidebar-role">Administrador</span>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ── Main Content ── -->
+  <div class="main-content">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18"/>
+          </svg>
+        </button>
+        <div class="breadcrumbs">
+          <span class="breadcrumb-current" id="breadcrumb-current">Dashboard</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" onclick="showToast('Tienes 3 notificaciones pendientes','warning')">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="badge">3</span>
+        </button>
+        <div class="topbar-user">
+          <div class="topbar-user-avatar" id="topbar-avatar">C</div>
+          <div class="topbar-user-info">
+            <span class="tu-name" id="topbar-name">Carlos Mendoza</span>
+            <span class="tu-role" id="topbar-role">ADMIN</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="content-wrapper">
+
+      <!-- ── DASHBOARD ── -->
+      <div id="view-dashboard" class="active">
+        <div class="dashboard-header">
+          <h1>Bienvenido</h1>
+          <p>Sistema de Gestión – Maestranza Forestal</p>
+        </div>
+        <div class="section-title">📦 Módulos del Sistema</div>
+        <div class="modules-grid">
+          <div class="module-card green" onclick="navigate('purchase-list', document.querySelector('.nav-item:nth-child(2)'))">
+            <div class="module-icon">🛒</div>
+            <div class="module-content">
+              <h3>Compra Materiales</h3>
+              <p>Gestiona proveedores, cotizaciones y órdenes de compra de materiales</p>
+              <button class="module-btn">Acceder <span class="arrow">→</span></button>
+            </div>
+          </div>
+          <div class="module-card blue" onclick="navigate('coming', document.querySelector('.nav-item:nth-child(3)'), 'Ventas')">
+            <div class="module-icon">📈</div>
+            <div class="module-content">
+              <h3>Ventas</h3>
+              <p>Administra clientes, presupuestos y seguimiento de ventas</p>
+              <button class="module-btn">Acceder <span class="arrow">→</span></button>
+            </div>
+          </div>
+          <div class="module-card purple" onclick="navigate('coming', document.querySelector('.nav-item:nth-child(4)'), 'Ingeniería')">
+            <div class="module-icon">⚙️</div>
+            <div class="module-content">
+              <h3>Ingeniería</h3>
+              <p>Proyectos, planos, especificaciones técnicas y documentación</p>
+              <button class="module-btn">Acceder <span class="arrow">→</span></button>
+            </div>
+          </div>
+          <div class="module-card orange" onclick="navigate('coming', document.querySelector('.nav-item:nth-child(5)'), 'Supervisión')">
+            <div class="module-icon">🔍</div>
+            <div class="module-content">
+              <h3>Supervisión</h3>
+              <p>Control de calidad, inspecciones y auditorías</p>
+              <button class="module-btn">Acceder <span class="arrow">→</span></button>
+            </div>
+          </div>
+          <div class="module-card teal" onclick="navigate('coming', document.querySelector('.nav-item:nth-child(6)'), 'Contabilidad')">
+            <div class="module-icon">💰</div>
+            <div class="module-content">
+              <h3>Contabilidad</h3>
+              <p>Facturación, pagos, balances y reportes financieros</p>
+              <button class="module-btn">Acceder <span class="arrow">→</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PURCHASE LIST ── -->
+      <div id="view-purchase-list">
+        <div class="page-header">
+          <div>
+            <h1>Compra Materiales</h1>
+            <p>Gestión de proveedores y materiales para maestranza forestal</p>
+          </div>
+          <button class="btn-primary" id="btn-new-purchase" onclick="navigate('purchase-form-new')">+ Nuevo Registro</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-container">
+          <div class="search-bar">
+            <div class="search-input-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" class="search-input" id="search-input" placeholder="Buscar por empresa, vendedor, RUT o materiales..." oninput="filterTable()">
+            </div>
+            <button class="filter-toggle" onclick="toggleFilters()">
+              Filtros <span id="filter-toggle-icon">▼</span>
+            </button>
+          </div>
+          <div class="filters-panel" id="filters-panel">
+            <div class="filters-grid">
+              <div class="filter-group">
+                <label>Empresa</label>
+                <input type="text" id="f-empresa" placeholder="Nombre de empresa" oninput="filterTable()">
+              </div>
+              <div class="filter-group">
+                <label>Estado</label>
+                <select id="f-estado" onchange="filterTable()">
+                  <option value="">Todos</option>
+                  <option>Activo</option>
+                  <option>Inactivo</option>
+                  <option>Pendiente</option>
+                  <option>En Revisión</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Materiales</label>
+                <input type="text" id="f-materiales" placeholder="Tipo de material" oninput="filterTable()">
+              </div>
+              <div class="filter-group">
+                <label>Vendedor</label>
+                <input type="text" id="f-vendedor" placeholder="Nombre del vendedor" oninput="filterTable()">
+              </div>
+            </div>
+            <div class="filter-actions">
+              <button class="clear-filters" onclick="clearFilters()">Limpiar filtros</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-section">
+          <div class="table-responsive">
+            <table class="compact-table">
+              <thead>
+                <tr>
+                  <th>Empresa</th>
+                  <th>Vendedor</th>
+                  <th>Teléfono</th>
+                  <th>Estado</th>
+                  <th class="actions-header">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="purchase-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="records-count" id="records-count"></div>
+      </div>
+
+      <!-- ── PURCHASE FORM (NEW / EDIT) ── -->
+      <div id="view-purchase-form">
+        <div class="form-header">
+          <h1 id="form-title">Nuevo Registro</h1>
+          <p>Completa los datos del proveedor y materiales</p>
+        </div>
+        <form class="material-form" onsubmit="handleFormSubmit(event)">
+          <div class="form-grid">
+            <div class="fg full-width">
+              <label>Nombre de la Empresa *</label>
+              <input type="text" id="ff-empresa" placeholder="Ej: Forestal Demo S.A." required>
+            </div>
+            <div class="fg">
+              <label>RUT Empresa *</label>
+              <input type="text" id="ff-rut" placeholder="XX.XXX.XXX-X" required>
+            </div>
+            <div class="fg">
+              <label>Teléfono *</label>
+              <input type="tel" id="ff-tel" placeholder="+56 9 1234 5678" required>
+            </div>
+            <div class="fg">
+              <label>Nombre Vendedor *</label>
+              <input type="text" id="ff-vendedor" placeholder="Nombre completo" required>
+            </div>
+            <div class="fg">
+              <label>Cargo / Rol *</label>
+              <input type="text" id="ff-cargo" placeholder="Ej: Jefe de Compras" required>
+            </div>
+            <div class="fg">
+              <label>Correo Electrónico *</label>
+              <input type="email" id="ff-correo" placeholder="contacto@empresa.cl" required>
+            </div>
+            <div class="fg full-width">
+              <label>Dirección *</label>
+              <input type="text" id="ff-direccion" placeholder="Dirección completa" required>
+            </div>
+            <div class="fg">
+              <label>Materiales *</label>
+              <textarea id="ff-materiales" rows="3" placeholder="Ej: Fierro, Acero inoxidable, Pernos" required></textarea>
+            </div>
+            <div class="fg">
+              <label>Estado *</label>
+              <select id="ff-estado">
+                <option>Activo</option>
+                <option>Inactivo</option>
+                <option>Pendiente</option>
+                <option>En Revisión</option>
+              </select>
+            </div>
+            <div class="fg full-width">
+              <label>Observaciones</label>
+              <textarea id="ff-obs" rows="3" placeholder="Información adicional..."></textarea>
+              <span class="field-hint">Máximo 500 caracteres</span>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="navigate('purchase-list', document.querySelector('.nav-item:nth-child(2)'))">Cancelar</button>
+            <button type="submit" class="btn-primary" id="form-submit-btn">Crear Registro</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ── COMING SOON ── -->
+      <div id="view-coming">
+        <div class="coming-icon">🚧</div>
+        <div class="coming-title" id="coming-title">Módulo en desarrollo</div>
+        <div class="coming-sub">Este módulo estará disponible próximamente.</div>
+      </div>
+
+    </div><!-- /content-wrapper -->
+  </div><!-- /main-content -->
+</div><!-- /app-shell -->
+
+<!-- ── Detail Drawer ── -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer(event)">
+  <div class="drawer" id="drawer" onclick="event.stopPropagation()">
+    <div class="drawer-header">
+      <h3>Detalle del Proveedor</h3>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+    <div class="drawer-footer" id="drawer-footer"></div>
+  </div>
+</div>
+
+<!-- ── Toast Container ── -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ══════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════ -->
+<script>
+/* ─── Demo Data ──────────────────────────────────── */
+const DEMO_MATERIALS = [
+  { id:1,  empresa_nombre:"Metalúrgica del Sur Demo S.A.",    rut_empresa:"76.543.210-K", vendedor_nombre:"Roberto Fuentes",   cargo_rol:"Gerente Comercial",   telefono:"+56 9 7123 4561", correo:"rfuentes@metalsur-demo.cl",     direccion:"Av. Industrial 1450, Concepción",       materiales:"Fierro estructural, Acero inoxidable 304, Platinas",      estado:"Activo",     observaciones:"Proveedor principal de fierros. Entrega en 48 hrs." },
+  { id:2,  empresa_nombre:"Pernos & Tuercas Chile Demo Ltda.",rut_empresa:"77.123.456-3", vendedor_nombre:"Patricia Salgado",  cargo_rol:"Ejecutiva de Ventas",  telefono:"+56 9 8234 5672", correo:"psalgado@pernoschile-demo.cl",   direccion:"Parque Industrial Coronel, Lote 22",    materiales:"Pernos galvanizados, Tuercas hexagonales, Tornillos inox",estado:"Activo",     observaciones:"Descuento especial por volumen sobre 500 unidades." },
+  { id:3,  empresa_nombre:"Ferretería Maderera Austral Demo", rut_empresa:"12.345.678-9", vendedor_nombre:"Andrés Castillo",   cargo_rol:"Jefe de Ventas",       telefono:"+56 9 9345 6783", correo:"acastillo@maderera-demo.cl",     direccion:"Ruta 5 Sur Km. 512, Los Ángeles",       materiales:"Clavos de acero, Tornillería variada, Adhesivos industriales",estado:"Activo",  observaciones:"Solo acepta pedidos mínimos de $200.000 CLP." },
+  { id:4,  empresa_nombre:"Soldaduras Especiales Araucana",   rut_empresa:"96.123.789-1", vendedor_nombre:"Claudia Herrera",   cargo_rol:"Representante Técnica",telefono:"+56 9 6456 7894", correo:"cherrera@araucana-demo.cl",      direccion:"Manuel Montt 890, Temuco",              materiales:"Electrodos E6013, Varillas de soldadura TIG, Fluxcore",   estado:"Pendiente",  observaciones:"Requiere cotización formal antes de cada pedido." },
+  { id:5,  empresa_nombre:"Repuestos Industriales Bío-Bío",   rut_empresa:"77.987.654-2", vendedor_nombre:"Marcelo Rojas",     cargo_rol:"Vendedor Senior",      telefono:"+56 9 5567 8905", correo:"mrojas@repuestosbio-demo.cl",    direccion:"Av. Los Carrera 345, Chillán",          materiales:"Rodamientos SKF, Correas trapezoidales, Retenes industriales",estado:"Activo",  observaciones:"Tiempo de entrega estándar 3-5 días hábiles." },
+  { id:6,  empresa_nombre:"Pinturas & Recubrimientos PinCon", rut_empresa:"76.888.111-5", vendedor_nombre:"Gabriela Torres",   cargo_rol:"Asesora Comercial",    telefono:"+56 9 4678 9016", correo:"gtorres@pincon-demo.cl",         direccion:"Calle Serrano 120, Valdivia",            materiales:"Pintura epóxica, Anticorrosivo marino, Diluyentes",       estado:"En Revisión",observaciones:"Producto requiere homologación interna antes de uso." },
+  { id:7,  empresa_nombre:"Gasfitería Industrial Norte Demo", rut_empresa:"78.234.567-8", vendedor_nombre:"Felipe Contreras", cargo_rol:"Jefe de Área Industrial",telefono:"+56 9 3789 0127", correo:"fcontreras@gasinorte-demo.cl",  direccion:"Zona Industrial La Chimba, Antofagasta", materiales:"Tuberías HDPE, Codos y reducciones, Válvulas de paso",    estado:"Activo",     observaciones:"Proveedor certificado para obras en terreno." },
+  { id:8,  empresa_nombre:"Abrasivos & Discos Profesionales", rut_empresa:"76.765.432-0", vendedor_nombre:"Jorge Sepúlveda",  cargo_rol:"Ejecutivo de Cuentas",  telefono:"+56 9 2890 1238", correo:"jsepulveda@abrasivos-demo.cl",   direccion:"Parque Industrial Pudahuel, Nave 8",    materiales:"Discos de corte 9\", Discos de desbaste, Lijas industriales",estado:"Activo",  observaciones:"Entregas solo de lunes a jueves." },
+  { id:9,  empresa_nombre:"Lubricantes Forestales del Maule", rut_empresa:"97.456.123-K", vendedor_nombre:"Sandra Muñoz",     cargo_rol:"Representante Regional",telefono:"+56 9 1901 2349", correo:"smunoz@lubrimaule-demo.cl",      direccion:"Avda. O'Higgins 2340, Talca",           materiales:"Aceite hidráulico ISO 68, Grasa de litio multipropósito",  estado:"Inactivo",   observaciones:"Suspendido por incumplimiento de plazos. En evaluación." },
+  { id:10, empresa_nombre:"Cables & Conductores Patagonia",   rut_empresa:"77.321.654-7", vendedor_nombre:"Cristian Aguilar", cargo_rol:"Gerente de Ventas",     telefono:"+56 9 0912 3450", correo:"caguilar@cablepatag-demo.cl",   direccion:"Ruta 7 Sur 890, Puerto Montt",          materiales:"Cable THHN 10AWG, Conductor desnudo, Terminales y prensas",estado:"Activo",    observaciones:"Proveedor exclusivo para instalaciones eléctricas certificadas." },
+  { id:11, empresa_nombre:"Equipos de Seguridad AntaFarma",   rut_empresa:"76.112.233-4", vendedor_nombre:"María Pizarro",    cargo_rol:"Ejecutiva Corporativa",  telefono:"+56 9 8023 4561", correo:"mpizarro@antafarma-demo.cl",    direccion:"Monseñor Álamos 1200, Santiago",        materiales:"Cascos forestales, Guantes anticorte, Arnés de seguridad",estado:"Activo",     observaciones:"Todos los EPP cumplen norma chilena NCh." },
+  { id:12, empresa_nombre:"Maquinaria Liviana Araucanía S.A.",rut_empresa:"96.987.321-6", vendedor_nombre:"Héctor Yáñez",     cargo_rol:"Técnico-Comercial",     telefono:"+56 9 7134 5672", correo:"hyanez@maqaraucanía-demo.cl",   direccion:"Camino a Cunco Km. 3, Temuco",          materiales:"Motosierras repuestos, Cadenas de corte, Barras guía",    estado:"Pendiente",  observaciones:"Requiere contrato marco previo para pedidos recurrentes." },
+];
+
+let filteredData = [...DEMO_MATERIALS];
+const currentUser = { name:'Carlos Mendoza', role:'ADMIN', roleLabel:'Administrador', initial:'C' };
+let editingId = null;
+
+/* ─── Sidebar ────────────────────────────────────── */
+function toggleSidebar() {
+  document.getElementById('app-shell').classList.toggle('sidebar-collapsed');
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+
+/* ─── Navigation ─────────────────────────────────── */
+function navigate(view, navEl, extraParam) {
+  // Hide all views
+  document.querySelectorAll('#view-dashboard,#view-purchase-list,#view-purchase-form,#view-coming')
+    .forEach(v => v.classList.remove('active'));
+
+  // Deactivate nav items
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  const breadcrumbMap = {
+    'dashboard':        'Dashboard',
+    'purchase-list':    'Compra Materiales',
+    'purchase-form-new':'Nuevo Registro',
+    'purchase-form-edit':'Editar Registro',
+    'coming':           extraParam || 'Módulo',
+  };
+  document.getElementById('breadcrumb-current').textContent = breadcrumbMap[view] || view;
+
+  if (navEl) navEl.classList.add('active');
+
+  if (view === 'dashboard') {
+    document.getElementById('view-dashboard').classList.add('active');
+  } else if (view === 'purchase-list') {
+    renderTable();
+    document.getElementById('view-purchase-list').classList.add('active');
+  } else if (view === 'purchase-form-new') {
+    editingId = null;
+    document.getElementById('form-title').textContent = 'Nuevo Registro';
+    document.getElementById('form-submit-btn').textContent = 'Crear Registro';
+    clearForm();
+    document.getElementById('view-purchase-form').classList.add('active');
+  } else if (view === 'purchase-form-edit') {
+    document.getElementById('form-title').textContent = 'Editar Registro';
+    document.getElementById('form-submit-btn').textContent = 'Actualizar Registro';
+    document.getElementById('view-purchase-form').classList.add('active');
+  } else if (view === 'coming') {
+    document.getElementById('coming-title').textContent = (extraParam || 'Módulo') + ' – En Desarrollo';
+    document.getElementById('view-coming').classList.add('active');
+  }
+}
+
+/* ─── Table Rendering ────────────────────────────── */
+function getStatusClass(estado) {
+  const map = { 'Activo':'status-activo','Inactivo':'status-inactivo','Pendiente':'status-pendiente','En Revisión':'status-revision' };
+  return map[estado] || 'status-activo';
+}
+
+function renderTable() {
+  const tbody = document.getElementById('purchase-tbody');
+  const isAdmin = true;
+
+  if (filteredData.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:3rem;color:var(--gray-400);font-size:.9rem;">No se encontraron registros</td></tr>`;
+    document.getElementById('records-count').textContent = '';
+    return;
+  }
+
+  tbody.innerHTML = filteredData.map(m => `
+    <tr onclick="openDrawer(${m.id})">
+      <td><div class="empresa-info"><span class="empresa-icon">🏭</span><span class="empresa-name">${m.empresa_nombre}</span></div></td>
+      <td>${m.vendedor_nombre}</td>
+      <td class="phone-cell">${m.telefono}</td>
+      <td><span class="status-badge ${getStatusClass(m.estado)}">${m.estado}</span></td>
+      <td class="actions-cell" onclick="event.stopPropagation()">
+        ${isAdmin ? `<button class="action-btn edit" onclick="editRecord(${m.id})" title="Editar">✏️</button>
+        <button class="action-btn delete" onclick="deleteRecord(${m.id})" title="Eliminar">🗑️</button>` : '–'}
+      </td>
+    </tr>
+  `).join('');
+
+  const count = filteredData.length;
+  document.getElementById('records-count').textContent = `Mostrando ${count} registro${count !== 1 ? 's' : ''}`;
+}
+
+/* ─── Filter ─────────────────────────────────────── */
+function filterTable() {
+  const search  = (document.getElementById('search-input').value || '').toLowerCase();
+  const empresa = (document.getElementById('f-empresa').value || '').toLowerCase();
+  const estado  = (document.getElementById('f-estado').value || '');
+  const materiales = (document.getElementById('f-materiales').value || '').toLowerCase();
+  const vendedor   = (document.getElementById('f-vendedor').value || '').toLowerCase();
+
+  filteredData = DEMO_MATERIALS.filter(m => {
+    const s = !search || [m.empresa_nombre,m.vendedor_nombre,m.rut_empresa,m.materiales].some(v => v.toLowerCase().includes(search));
+    const e = !empresa || m.empresa_nombre.toLowerCase().includes(empresa);
+    const st = !estado || m.estado === estado;
+    const mat = !materiales || m.materiales.toLowerCase().includes(materiales);
+    const ven = !vendedor || m.vendedor_nombre.toLowerCase().includes(vendedor);
+    return s && e && st && mat && ven;
+  });
+  renderTable();
+}
+
+function toggleFilters() {
+  const panel = document.getElementById('filters-panel');
+  const icon = document.getElementById('filter-toggle-icon');
+  panel.classList.toggle('expanded');
+  icon.textContent = panel.classList.contains('expanded') ? '▲' : '▼';
+}
+
+function clearFilters() {
+  ['search-input','f-empresa','f-materiales','f-vendedor'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-estado').value = '';
+  filteredData = [...DEMO_MATERIALS];
+  renderTable();
+}
+
+/* ─── CRUD (demo) ────────────────────────────────── */
+function deleteRecord(id) {
+  if (!confirm('¿Estás seguro de eliminar este registro?')) return;
+  const idx = DEMO_MATERIALS.findIndex(m => m.id === id);
+  if (idx !== -1) DEMO_MATERIALS.splice(idx, 1);
+  filteredData = filteredData.filter(m => m.id !== id);
+  renderTable();
+  showToast('Registro eliminado correctamente');
+}
+
+function editRecord(id) {
+  editingId = id;
+  const m = DEMO_MATERIALS.find(x => x.id === id);
+  if (!m) return;
+  document.getElementById('ff-empresa').value   = m.empresa_nombre;
+  document.getElementById('ff-rut').value       = m.rut_empresa;
+  document.getElementById('ff-tel').value       = m.telefono;
+  document.getElementById('ff-vendedor').value  = m.vendedor_nombre;
+  document.getElementById('ff-cargo').value     = m.cargo_rol;
+  document.getElementById('ff-correo').value    = m.correo;
+  document.getElementById('ff-direccion').value = m.direccion;
+  document.getElementById('ff-materiales').value= m.materiales;
+  document.getElementById('ff-estado').value    = m.estado;
+  document.getElementById('ff-obs').value       = m.observaciones || '';
+  navigate('purchase-form-edit', document.querySelector('.nav-item:nth-child(2)'));
+  closeDrawer();
+}
+
+function clearForm() {
+  ['ff-empresa','ff-rut','ff-tel','ff-vendedor','ff-cargo','ff-correo','ff-direccion','ff-materiales','ff-obs'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('ff-estado').value = 'Activo';
+}
+
+function handleFormSubmit(e) {
+  e.preventDefault();
+  if (editingId) {
+    const m = DEMO_MATERIALS.find(x => x.id === editingId);
+    if (m) {
+      m.empresa_nombre  = document.getElementById('ff-empresa').value;
+      m.rut_empresa     = document.getElementById('ff-rut').value;
+      m.telefono        = document.getElementById('ff-tel').value;
+      m.vendedor_nombre = document.getElementById('ff-vendedor').value;
+      m.cargo_rol       = document.getElementById('ff-cargo').value;
+      m.correo          = document.getElementById('ff-correo').value;
+      m.direccion       = document.getElementById('ff-direccion').value;
+      m.materiales      = document.getElementById('ff-materiales').value;
+      m.estado          = document.getElementById('ff-estado').value;
+      m.observaciones   = document.getElementById('ff-obs').value;
+    }
+    showToast('Registro actualizado correctamente');
+  } else {
+    const newId = DEMO_MATERIALS.length ? Math.max(...DEMO_MATERIALS.map(x=>x.id)) + 1 : 1;
+    DEMO_MATERIALS.unshift({
+      id: newId,
+      empresa_nombre:  document.getElementById('ff-empresa').value,
+      rut_empresa:     document.getElementById('ff-rut').value,
+      telefono:        document.getElementById('ff-tel').value,
+      vendedor_nombre: document.getElementById('ff-vendedor').value,
+      cargo_rol:       document.getElementById('ff-cargo').value,
+      correo:          document.getElementById('ff-correo').value,
+      direccion:       document.getElementById('ff-direccion').value,
+      materiales:      document.getElementById('ff-materiales').value,
+      estado:          document.getElementById('ff-estado').value,
+      observaciones:   document.getElementById('ff-obs').value,
+    });
+    showToast('Registro creado correctamente');
+  }
+  filteredData = [...DEMO_MATERIALS];
+  navigate('purchase-list', document.querySelector('.nav-item:nth-child(2)'));
+}
+
+/* ─── Detail Drawer ──────────────────────────────── */
+function openDrawer(id) {
+  const m = DEMO_MATERIALS.find(x => x.id === id);
+  if (!m) return;
+  const isAdmin = true;
+
+  document.getElementById('drawer-body').innerHTML = `
+    <div class="detail-section">
+      <h4>Información de la Empresa</h4>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">Empresa</div>
+          <div class="detail-value">${m.empresa_nombre}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">RUT</div>
+          <div class="detail-value">${m.rut_empresa}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Dirección</div>
+          <div class="detail-value full">${m.direccion}</div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>Contacto Comercial</h4>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">Vendedor</div>
+          <div class="detail-value">${m.vendedor_nombre}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Cargo / Rol</div>
+          <div class="detail-value">${m.cargo_rol}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Teléfono</div>
+          <div class="detail-value" style="font-family:monospace">${m.telefono}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Correo</div>
+          <div class="detail-value">${m.correo}</div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>Materiales y Estado</h4>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">Estado</div>
+          <div class="detail-status"><span class="status-badge ${getStatusClass(m.estado)}">${m.estado}</span></div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Materiales</div>
+          <div class="detail-value full">${m.materiales}</div>
+        </div>
+        ${m.observaciones ? `<div class="detail-item" style="grid-column:span 2">
+          <div class="detail-label">Observaciones</div>
+          <div class="detail-value" style="font-size:.82rem;color:var(--gray-600);line-height:1.5">${m.observaciones}</div>
+        </div>` : ''}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('drawer-footer').innerHTML = isAdmin ? `
+    <button class="btn-danger" onclick="deleteRecord(${m.id});closeDrawer()">🗑️ Eliminar</button>
+    <button class="btn-secondary" onclick="closeDrawer()">Cerrar</button>
+    <button class="btn-primary" onclick="editRecord(${m.id})">✏️ Editar</button>
+  ` : `<button class="btn-secondary" onclick="closeDrawer()">Cerrar</button>`;
+
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer(e) {
+  if (e && e.target !== document.getElementById('drawer-overlay')) return;
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ─── Toast ──────────────────────────────────────── */
+function showToast(msg, type='success') {
+  const icons = { success:'✅', warning:'⚠️', error:'❌' };
+  const container = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type === 'success' ? '' : type}`;
+  t.innerHTML = `<span class="toast-icon">${icons[type]}</span><span class="toast-msg">${msg}</span>`;
+  container.appendChild(t);
+  setTimeout(() => { t.style.animation = 'slideOut .3s ease-in forwards'; setTimeout(() => t.remove(), 300); }, 3200);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1578 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo | Centro Soporte IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    :root {
+      --primary: #10a37f;
+      --primary-dark: #0d8c6c;
+      --primary-soft: #dff7ef;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f7f7f8;
+      --text-primary: #343541;
+      --text-secondary: #6e6e80;
+      --text-tertiary: #8e8ea0;
+      --border-color: #e5e5e7;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: "Manrope", sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    .app-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      flex-shrink: 0;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      width: 100%;
+      margin: 0 auto;
+      gap: 10px;
+    }
+
+    .header-left,
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .header-right {
+      justify-content: flex-end;
+    }
+
+    .header-center {
+      flex: 1;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      opacity: 0.96;
+    }
+
+    .sidebar-toggle,
+    .header-btn,
+    .user-btn {
+      background: rgba(255, 255, 255, 0.13);
+      border: none;
+      color: white;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .sidebar-toggle,
+    .header-btn {
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-toggle:hover,
+    .header-btn:hover,
+    .user-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .logo-label {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .user-menu {
+      position: relative;
+    }
+
+    .user-btn {
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.26);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .user-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 240px;
+      border-radius: var(--radius-md);
+      background: white;
+      color: var(--text-primary);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid #ececf0;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: 0.2s ease;
+      z-index: 2000;
+    }
+
+    .user-menu:hover .user-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-head,
+    .dropdown-item {
+      padding: 12px 14px;
+    }
+
+    .dropdown-head {
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.82rem;
+      line-height: 1.35;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 0.86rem;
+    }
+
+    .dropdown-item:hover {
+      background: var(--bg-secondary);
+    }
+
+    .main-content {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      background: var(--bg-primary);
+    }
+
+    .app-sidebar {
+      position: fixed;
+      top: 64px;
+      left: 0;
+      width: 286px;
+      height: calc(100vh - 64px);
+      background: white;
+      border-right: 1px solid var(--border-color);
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      z-index: 999;
+      overflow-y: auto;
+    }
+
+    .app-sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      inset: 64px 0 0 0;
+      background: rgba(0, 0, 0, 0.28);
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.25s ease;
+      z-index: 998;
+    }
+
+    .sidebar-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .sidebar-content {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .new-chat-btn {
+      width: 100%;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      font-weight: 600;
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .new-chat-btn:hover {
+      filter: brightness(1.03);
+    }
+
+    .section-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-tertiary);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      border: 1px solid transparent;
+      padding: 9px 10px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 0.86rem;
+      margin-bottom: 4px;
+      background: transparent;
+      color: var(--text-primary);
+      text-align: left;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-secondary);
+    }
+
+    .nav-item.active {
+      background: var(--primary-soft);
+      border-color: #b7ecd9;
+      color: #0a6d57;
+      font-weight: 700;
+    }
+
+    .nav-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 0.84rem;
+      flex-shrink: 0;
+    }
+
+    .nav-icon.support { background: #10a37f; }
+    .nav-icon.entel { background: #fb923c; }
+    .nav-icon.onnet { background: #4caf50; }
+    .nav-icon.ifp { background: #4c6daf; }
+    .nav-icon.checklist { background: #22c55e; }
+    .nav-icon.fortigate { background: #ef4444; }
+    .nav-icon.tiempo { background: #f59e0b; }
+    .nav-icon.equifiber { background: #0ea5e9; }
+    .nav-icon.validador { background: #8b5cf6; }
+
+    .system-status {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      font-size: 0.8rem;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .status-item:last-child { margin-bottom: 0; }
+
+    .status-indicator {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+
+    .online { background: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18); }
+    .ai { background: #10a37f; box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.2); }
+
+    .split-layout {
+      display: flex;
+      min-height: calc(100vh - 64px);
+      height: calc(100vh - 64px);
+      overflow: hidden;
+    }
+
+    .orders-section {
+      flex: 3;
+      width: 75%;
+      overflow-y: auto;
+      background: var(--bg-secondary);
+      padding: 12px;
+    }
+
+    .chat-section {
+      flex: 1;
+      width: 25%;
+      border-left: 1px solid var(--border-color);
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      min-width: 320px;
+      max-width: 430px;
+    }
+
+    .welcome-header {
+      margin-bottom: 14px;
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 8px 24px rgba(16, 163, 127, 0.22);
+    }
+
+    .welcome-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .welcome-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .welcome-subtitle {
+      font-size: 0.75rem;
+      opacity: 0.93;
+    }
+
+    .order-search-container {
+      min-width: 260px;
+    }
+
+    .order-search-wrapper {
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.78rem;
+    }
+
+    .order-search-input {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      color: white;
+      padding: 8px 34px 8px 34px;
+      outline: none;
+      font-size: 0.82rem;
+    }
+
+    .order-search-input::placeholder { color: rgba(255, 255, 255, 0.78); }
+
+    .order-search-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 22px;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      background: rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      display: none;
+      place-items: center;
+      font-size: 0.68rem;
+    }
+
+    .order-search-clear.visible {
+      display: grid;
+    }
+
+    .search-results-count {
+      font-size: 0.66rem;
+      text-align: right;
+      margin-top: 5px;
+      opacity: 0.85;
+    }
+
+    .collapse-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: white;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .collapse-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .orders-count-badge {
+      font-size: 0.7rem;
+      color: white;
+      background: var(--primary);
+      border-radius: 999px;
+      padding: 2px 9px;
+      margin-left: 6px;
+    }
+
+    .orders-table-wrapper {
+      overflow: hidden;
+      transition: 0.25s ease;
+      margin-bottom: 12px;
+    }
+
+    .orders-table-wrapper.collapsed {
+      max-height: 0;
+      opacity: 0;
+      margin-bottom: 0;
+    }
+
+    .orders-table-container {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      box-shadow: var(--shadow);
+    }
+
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 780px;
+      font-size: 0.81rem;
+    }
+
+    .orders-table th {
+      text-align: left;
+      padding: 12px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .orders-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .orders-table tbody tr:hover {
+      background: #f3f6f8;
+    }
+
+    .orders-table tbody tr.selected {
+      background: rgba(16, 163, 127, 0.1);
+      box-shadow: inset 3px 0 0 #10a37f;
+    }
+
+    .col-number { width: 60px; text-align: center; }
+    .col-order-id { width: 120px; }
+    .col-service-code { width: 145px; }
+    .col-product { width: 210px; }
+    .col-activity { min-width: 240px; }
+
+    .order-id-link {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .order-detail-container {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      animation: slide-up 0.2s ease;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    @keyframes slide-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .order-detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 14px;
+      background: linear-gradient(135deg, #f8f9fa, #eceff2);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .order-detail-header h3 {
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .close-detail-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+
+    .close-detail-btn:hover { background: #e9eef0; }
+
+    .order-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .detail-column {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .order-detail-row {
+      display: flex;
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      align-items: flex-start;
+    }
+
+    .order-detail-label {
+      width: 115px;
+      color: var(--text-secondary);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .order-detail-value {
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .activity-highlight {
+      background: rgba(16, 163, 127, 0.1);
+      box-shadow: inset 3px 0 0 var(--primary);
+    }
+
+    .order-status {
+      font-size: 0.7rem;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-weight: 800;
+      display: inline-block;
+    }
+
+    .status-pendiente { background: #fff3cd; color: #7a5e00; }
+    .status-progreso { background: #d6ebff; color: #004085; }
+    .status-completada { background: #dff6e3; color: #0f5132; }
+    .status-pendiente-visita { background: #ffe9be; color: #7a5e00; }
+
+    .order-detail-actions {
+      border-top: 1px solid var(--border-color);
+      padding: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .order-detail-action-btn {
+      flex: 1;
+      min-width: 130px;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 10px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .recursos { background: #17a2b8; color: white; }
+    .preactivacion { background: #ffc107; color: #27272a; }
+    .activacion { background: #28a745; color: white; }
+    .soporte { background: var(--primary); color: white; }
+    .checklist { background: #0088ff; color: white; }
+
+    .mini-chat-app {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-head {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-title-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+    }
+
+    .mini-messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chat-welcome-message {
+      border: 1px dashed #cdebe0;
+      background: #f5fcf9;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .welcome-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      margin: 0 auto 10px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      font-size: 1.3rem;
+    }
+
+    .welcome-chat-title {
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .welcome-text {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin-bottom: 10px;
+    }
+
+    .welcome-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .suggestion-tag {
+      border: 1px solid var(--border-color);
+      background: white;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 0.7rem;
+      cursor: pointer;
+    }
+
+    .suggestion-tag:hover {
+      background: var(--primary-soft);
+      border-color: #bee9db;
+      color: #0a6d57;
+    }
+
+    .message {
+      display: flex;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    .avatar-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 0.82rem;
+    }
+
+    .user-avatar-chat { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+    .ai-avatar-chat { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+
+    .message-text {
+      font-size: 0.82rem;
+      line-height: 1.45;
+      margin-bottom: 4px;
+      white-space: pre-wrap;
+    }
+
+    .message-meta {
+      font-size: 0.64rem;
+      color: var(--text-secondary);
+    }
+
+    .assistant-badge {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      padding: 2px 6px;
+      margin-left: 6px;
+    }
+
+    .feedback-buttons {
+      display: flex;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .feedback-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: white;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+
+    .feedback-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .typing-indicator {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      display: none;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .typing-indicator.visible {
+      display: flex;
+    }
+
+    .dot {
+      animation: pulse 1.3s infinite;
+      opacity: 0;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.15s; }
+    .dot:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    .input-container {
+      border-top: 1px solid var(--border-color);
+      padding: 10px;
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 26px;
+      background: var(--bg-secondary);
+      padding: 6px 10px;
+      align-items: flex-end;
+    }
+
+    .chat-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      font-size: 0.82rem;
+      max-height: 95px;
+      min-height: 28px;
+      line-height: 1.35;
+      padding-top: 5px;
+    }
+
+    .send-button {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .send-button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .input-footer {
+      margin-top: 7px;
+      font-size: 0.62rem;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .mobile-chat-toggle {
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      width: 54px;
+      height: 54px;
+      border-radius: 999px;
+      border: none;
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      box-shadow: 0 10px 26px rgba(16, 163, 127, 0.3);
+      display: none;
+      place-items: center;
+      z-index: 1200;
+      cursor: pointer;
+    }
+
+    .demo-ribbon {
+      position: fixed;
+      left: 14px;
+      bottom: 14px;
+      z-index: 1200;
+      background: #fff6d6;
+      color: #7a5e00;
+      border: 1px solid #ffe8a3;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      box-shadow: 0 5px 14px rgba(255, 195, 0, 0.16);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #10a37f;
+      border-radius: 3px;
+    }
+
+    @media (max-width: 1080px) {
+      .page-title {
+        font-size: 1.05rem;
+      }
+
+      .chat-section {
+        min-width: 300px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      html, body {
+        overflow: auto;
+      }
+
+      .split-layout {
+        flex-direction: column;
+        height: auto;
+        min-height: calc(100vh - 64px);
+      }
+
+      .orders-section {
+        width: 100%;
+        flex: none;
+        min-height: calc(100vh - 64px);
+        overflow: visible;
+      }
+
+      .chat-section {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 64px;
+        max-width: 100%;
+        width: 100%;
+        transform: translateY(100%);
+        transition: transform 0.25s ease;
+        z-index: 1150;
+      }
+
+      .chat-section.open {
+        transform: translateY(0);
+      }
+
+      .mobile-chat-toggle {
+        display: grid;
+      }
+
+      .header-center {
+        display: none;
+      }
+
+      .logo-label {
+        display: none;
+      }
+
+      .order-detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .order-search-container {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .welcome-title {
+        font-size: 1.06rem;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .header-content {
+        padding: 10px 12px;
+      }
+
+      .orders-section {
+        padding: 8px;
+      }
+
+      .welcome-header {
+        padding: 12px;
+      }
+
+      .order-detail-label {
+        width: 95px;
+        font-size: 0.72rem;
+      }
+
+      .order-detail-value {
+        font-size: 0.75rem;
+      }
+
+      .order-detail-action-btn {
+        min-width: calc(50% - 4px);
+      }
+
+      .demo-ribbon {
+        font-size: 0.65rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-content">
+        <div class="header-left">
+          <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="logo-container">
+            <div class="logo-badge">R</div>
+            <span class="logo-label">Demo</span>
+          </div>
+        </div>
+
+        <div class="header-center">
+          <span class="page-title">Centro Soporte IA</span>
+        </div>
+
+        <div class="header-right">
+          <button class="header-btn" aria-label="Documentación">
+            <i class="fas fa-book"></i>
+          </button>
+          <div class="user-menu">
+            <button class="user-btn" aria-label="Menú usuario">
+              <div class="user-avatar">A</div>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="user-dropdown">
+              <div class="dropdown-head">
+                <strong>Ana Rojas</strong><br>
+                Técnico Senior (Demo)
+              </div>
+              <div class="dropdown-item"><i class="fas fa-key"></i> Cambiar contraseña</div>
+              <div class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <aside class="app-sidebar" id="sidebar">
+      <div class="sidebar-content">
+        <button class="new-chat-btn"><i class="fas fa-plus"></i> Nueva conversación</button>
+
+        <section>
+          <h3 class="section-title">Asistentes</h3>
+          <button class="nav-item active"><span class="nav-icon support"><i class="fas fa-comments"></i></span> Centro Soporte IA</button>
+          <button class="nav-item"><span class="nav-icon entel"><i class="fas fa-tools"></i></span> Script Fortinet ENTEL</button>
+          <button class="nav-item"><span class="nav-icon onnet"><i class="fas fa-cog"></i></span> Script Fortinet ONNET</button>
+          <button class="nav-item"><span class="nav-icon ifp"><i class="fas fa-network-wired"></i></span> Configuraciones IFP</button>
+          <button class="nav-item"><span class="nav-icon checklist"><i class="fas fa-check-double"></i></span> Checklist</button>
+          <button class="nav-item"><span class="nav-icon fortigate"><i class="fas fa-shield-alt"></i></span> Configuración Fortigate</button>
+          <button class="nav-item"><span class="nav-icon tiempo"><i class="fas fa-clock"></i></span> Registro Tiempos BKP</button>
+          <button class="nav-item"><span class="nav-icon equifiber"><i class="fas fa-tachometer-alt"></i></span> Equifiber Entel</button>
+          <button class="nav-item"><span class="nav-icon validador"><i class="fas fa-check-circle"></i></span> Validador IFP</button>
+        </section>
+
+        <section>
+          <h3 class="section-title">Estado Sistema</h3>
+          <div class="system-status">
+            <div class="status-item"><span class="status-indicator online"></span> Sistema en línea</div>
+            <div class="status-item"><span class="status-indicator ai"></span> IA disponible</div>
+          </div>
+        </section>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main-content">
+      <div class="split-layout">
+        <section class="orders-section">
+          <div class="orders-dashboard">
+            <div class="welcome-header">
+              <div class="welcome-header-row">
+                <div class="welcome-content">
+                  <h1 class="welcome-title">Bienvenido, <span>Ana</span></h1>
+                  <p class="welcome-subtitle"><i class="fas fa-calendar-alt"></i> Sábado, 11 julio 2026</p>
+                </div>
+                <div class="order-search-container">
+                  <div class="order-search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input class="order-search-input" id="searchInput" type="text" placeholder="Buscar orden, cliente o actividad...">
+                    <button id="clearSearch" class="order-search-clear" aria-label="Limpiar búsqueda">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                  <div id="searchCount" class="search-results-count"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="collapse-header" id="collapseOrders">
+              <div class="collapse-title">
+                <i id="collapseIcon" class="fas fa-chevron-down"></i>
+                <span>Listado de Órdenes</span>
+                <span id="ordersBadge" class="orders-count-badge">0 órdenes</span>
+              </div>
+            </div>
+
+            <div class="orders-table-wrapper" id="ordersWrapper">
+              <div class="orders-table-container">
+                <table class="orders-table">
+                  <thead>
+                    <tr>
+                      <th class="col-number">#</th>
+                      <th class="col-order-id">N° Orden</th>
+                      <th class="col-service-code">Código Servicio</th>
+                      <th class="col-product">Producto</th>
+                      <th class="col-activity">Actividad</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ordersTbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="order-detail-container" id="orderDetail">
+              <div class="order-detail-header">
+                <h3><i class="fas fa-info-circle"></i> Detalles de la Orden</h3>
+                <button class="close-detail-btn" id="closeDetail" aria-label="Cerrar detalle">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <div class="order-detail-grid" id="orderDetailGrid"></div>
+              <div class="order-detail-actions">
+                <button class="order-detail-action-btn recursos"><i class="fas fa-boxes"></i> Consultar recursos</button>
+                <button class="order-detail-action-btn preactivacion"><i class="fas fa-bolt"></i> Preactivación</button>
+                <button class="order-detail-action-btn activacion"><i class="fas fa-phone-alt"></i> Activación</button>
+                <button class="order-detail-action-btn soporte"><i class="fas fa-headset"></i> Soporte</button>
+                <button class="order-detail-action-btn checklist"><i class="fas fa-check-double"></i> Checklist</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="chat-section" id="chatSection">
+          <div class="mini-chat-app">
+            <div class="chat-head">
+              <div class="chat-title">
+                <span class="chat-title-badge"><i class="fas fa-robot"></i></span>
+                Soporte IA
+              </div>
+              <small>Asistente Demo</small>
+            </div>
+
+            <div class="mini-messages-container" id="messagesContainer">
+              <div class="chat-welcome-message" id="chatWelcome">
+                <div class="welcome-icon"><i class="fas fa-robot"></i></div>
+                <h2 class="welcome-chat-title">Hola, soy tu asistente</h2>
+                <p class="welcome-text">Esta es una demo para portafolio. Todos los datos, clientes, contactos y órdenes son ficticios.</p>
+                <div class="welcome-suggestions">
+                  <button class="suggestion-tag" data-suggest="Resumen de la orden seleccionada">Resumen de orden</button>
+                  <button class="suggestion-tag" data-suggest="Pasos para preactivación">Preactivación</button>
+                  <button class="suggestion-tag" data-suggest="Checklist de instalación">Checklist</button>
+                </div>
+              </div>
+
+              <div id="messagesList"></div>
+              <div class="typing-indicator" id="typingIndicator">Escribiendo <span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
+            </div>
+
+            <div class="input-container">
+              <div class="input-wrapper">
+                <textarea id="chatInput" class="chat-input" rows="1" placeholder="Escribe tu mensaje..."></textarea>
+                <button id="sendBtn" class="send-button" disabled aria-label="Enviar">
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+              <div class="input-footer"><i class="fas fa-info-circle"></i> Puedo cometer errores. Verifica información importante.</div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <button class="mobile-chat-toggle" id="mobileChatToggle" aria-label="Abrir chat">
+    <i class="fas fa-comment-dots"></i>
+  </button>
+  <div class="demo-ribbon">Entorno Demo | Datos Ficticios</div>
+
+  <script>
+    const demoOrders = [
+      {
+        wo_id: "WO-90821",
+        codigo_servicio: "SV-240911",
+        producto: "Internet Fibra 800 Mbps",
+        actividad: "Instalacion inicial residencial",
+        cliente: "Marina Solis",
+        status: "Pendiente",
+        direccion: "Av. Bosques del Sur 155, Sector Norte",
+        fecha_agendada: "11-07-2026",
+        hora_agendada: "10:30",
+        telefono: "+56 9 4555 1021",
+        tecnico_asignado: "Ana Rojas"
+      },
+      {
+        wo_id: "WO-90822",
+        codigo_servicio: "SV-240912",
+        producto: "TV IP Premium",
+        actividad: "Migracion de equipamiento",
+        cliente: "Victor Perez",
+        status: "En Progreso",
+        direccion: "Pasaje Mirador 890, Torre B",
+        fecha_agendada: "11-07-2026",
+        hora_agendada: "11:15",
+        telefono: "+56 9 6123 0082",
+        tecnico_asignado: "Ana Rojas"
+      },
+      {
+        wo_id: "WO-90823",
+        codigo_servicio: "SV-240913",
+        producto: "Internet Empresa 1 Gbps",
+        actividad: "Diagnostico por latencia",
+        cliente: "Comercial Novaterra SPA",
+        status: "Pendiente Visita",
+        direccion: "Calle Central 44, Oficina 306",
+        fecha_agendada: "11-07-2026",
+        hora_agendada: "12:40",
+        telefono: "+56 2 2440 7721",
+        tecnico_asignado: "Ana Rojas"
+      },
+      {
+        wo_id: "WO-90824",
+        codigo_servicio: "SV-240914",
+        producto: "Wifi Mesh 3 Nodos",
+        actividad: "Reubicacion y optimizacion",
+        cliente: "Camila Navarro",
+        status: "Completada",
+        direccion: "Av. Horizonte 420, Casa 7",
+        fecha_agendada: "10-07-2026",
+        hora_agendada: "17:20",
+        telefono: "+56 9 7542 3108",
+        tecnico_asignado: "Ana Rojas"
+      },
+      {
+        wo_id: "WO-90825",
+        codigo_servicio: "SV-240915",
+        producto: "Telefonia IP 4 Anexos",
+        actividad: "Activacion y pruebas",
+        cliente: "Clinica Aurora",
+        status: "En Progreso",
+        direccion: "Av. Los Ciruelos 550",
+        fecha_agendada: "11-07-2026",
+        hora_agendada: "15:10",
+        telefono: "+56 2 2339 1840",
+        tecnico_asignado: "Ana Rojas"
+      }
+    ];
+
+    const chatAnswers = {
+      "resumen": "La orden seleccionada esta dentro de SLA. Se recomienda validar niveles de potencia y registrar fotos del punto final.",
+      "preactivacion": "Pasos sugeridos: 1) Validar stock ONT, 2) Confirmar serial, 3) Cargar parametros base, 4) Ejecutar prueba de conectividad.",
+      "checklist": "Checklist base: energia estable, patchcord correcto, luz PON en verde, navegacion y velocidad validadas, acta firmada.",
+      "default": "Puedo ayudarte con resumen tecnico, checklist, preactivacion o guias de solucion."
+    };
+
+    const sidebar = document.getElementById("sidebar");
+    const sidebarOverlay = document.getElementById("sidebarOverlay");
+    const sidebarToggle = document.getElementById("sidebarToggle");
+    const ordersTbody = document.getElementById("ordersTbody");
+    const searchInput = document.getElementById("searchInput");
+    const clearSearch = document.getElementById("clearSearch");
+    const searchCount = document.getElementById("searchCount");
+    const ordersBadge = document.getElementById("ordersBadge");
+    const orderDetail = document.getElementById("orderDetail");
+    const orderDetailGrid = document.getElementById("orderDetailGrid");
+    const closeDetail = document.getElementById("closeDetail");
+    const collapseOrders = document.getElementById("collapseOrders");
+    const collapseIcon = document.getElementById("collapseIcon");
+    const ordersWrapper = document.getElementById("ordersWrapper");
+    const messagesList = document.getElementById("messagesList");
+    const messagesContainer = document.getElementById("messagesContainer");
+    const chatWelcome = document.getElementById("chatWelcome");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const typingIndicator = document.getElementById("typingIndicator");
+    const chatSection = document.getElementById("chatSection");
+    const mobileChatToggle = document.getElementById("mobileChatToggle");
+
+    let filteredOrders = [...demoOrders];
+    let selectedOrder = demoOrders[0];
+    let isCollapsed = false;
+    let chatOpenMobile = false;
+
+    function statusClass(status) {
+      const normalized = status.toLowerCase().replace(/\s+/g, "-");
+      if (normalized.includes("pendiente-visita")) return "status-pendiente-visita";
+      if (normalized.includes("progreso")) return "status-progreso";
+      if (normalized.includes("completada")) return "status-completada";
+      return "status-pendiente";
+    }
+
+    function renderOrders() {
+      ordersTbody.innerHTML = "";
+
+      if (!filteredOrders.length) {
+        const row = document.createElement("tr");
+        row.innerHTML = '<td colspan="5" style="text-align:center;padding:30px;color:#6e6e80;">No hay resultados para la busqueda</td>';
+        ordersTbody.appendChild(row);
+      }
+
+      filteredOrders.forEach((order, index) => {
+        const tr = document.createElement("tr");
+        if (selectedOrder && selectedOrder.wo_id === order.wo_id) {
+          tr.classList.add("selected");
+        }
+        tr.innerHTML = `
+          <td class="col-number">${index + 1}</td>
+          <td class="col-order-id"><span class="order-id-link">${order.wo_id}</span></td>
+          <td class="col-service-code">${order.codigo_servicio}</td>
+          <td class="col-product">${order.producto}</td>
+          <td class="col-activity">${order.actividad}</td>
+        `;
+        tr.addEventListener("click", () => {
+          selectedOrder = order;
+          renderOrders();
+          renderDetail();
+          if (window.innerWidth <= 900) {
+            chatSection.classList.add("open");
+            chatOpenMobile = true;
+          }
+        });
+        ordersTbody.appendChild(tr);
+      });
+
+      searchCount.textContent = `${filteredOrders.length} de ${demoOrders.length} ordenes`;
+      ordersBadge.textContent = `${filteredOrders.length} ordenes`;
+    }
+
+    function renderDetail() {
+      if (!selectedOrder) {
+        orderDetail.style.display = "none";
+        return;
+      }
+      orderDetail.style.display = "block";
+
+      const left = `
+        <div class="detail-column">
+          <div class="order-detail-row"><div class="order-detail-label">N° Orden:</div><div class="order-detail-value"><strong>${selectedOrder.wo_id}</strong></div></div>
+          <div class="order-detail-row"><div class="order-detail-label">Cliente:</div><div class="order-detail-value">${selectedOrder.cliente}</div></div>
+          <div class="order-detail-row activity-highlight"><div class="order-detail-label">Actividad:</div><div class="order-detail-value"><strong>${selectedOrder.actividad}</strong></div></div>
+          <div class="order-detail-row"><div class="order-detail-label">Codigo Servicio:</div><div class="order-detail-value">${selectedOrder.codigo_servicio}</div></div>
+          <div class="order-detail-row"><div class="order-detail-label">Producto:</div><div class="order-detail-value">${selectedOrder.producto}</div></div>
+        </div>
+      `;
+
+      const right = `
+        <div class="detail-column">
+          <div class="order-detail-row"><div class="order-detail-label">Status:</div><div class="order-detail-value"><span class="order-status ${statusClass(selectedOrder.status)}">${selectedOrder.status}</span></div></div>
+          <div class="order-detail-row"><div class="order-detail-label">Direccion:</div><div class="order-detail-value">${selectedOrder.direccion}</div></div>
+          <div class="order-detail-row"><div class="order-detail-label">Fecha/Hora:</div><div class="order-detail-value">${selectedOrder.fecha_agendada} • ${selectedOrder.hora_agendada}</div></div>
+          <div class="order-detail-row"><div class="order-detail-label">Contacto:</div><div class="order-detail-value">${selectedOrder.telefono}</div></div>
+          <div class="order-detail-row"><div class="order-detail-label">Tecnico:</div><div class="order-detail-value">${selectedOrder.tecnico_asignado}</div></div>
+        </div>
+      `;
+
+      orderDetailGrid.innerHTML = left + right;
+    }
+
+    function addMessage(role, text) {
+      const container = document.createElement("div");
+      container.className = "message";
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mm = String(now.getMinutes()).padStart(2, "0");
+
+      container.innerHTML = `
+        <div class="message-avatar">
+          <div class="avatar-circle ${role === "user" ? "user-avatar-chat" : "ai-avatar-chat"}">
+            <i class="fas ${role === "user" ? "fa-user" : "fa-robot"}"></i>
+          </div>
+        </div>
+        <div class="message-content">
+          <div class="message-text">${text}</div>
+          <div class="message-meta">
+            ${hh}:${mm}
+            ${role === "assistant" ? '<span class="assistant-badge">Centro Soporte IA</span>' : ""}
+          </div>
+          ${role === "assistant" ? '<div class="feedback-buttons"><button class="feedback-btn"><i class="far fa-thumbs-up"></i></button><button class="feedback-btn"><i class="far fa-thumbs-down"></i></button></div>' : ""}
+        </div>
+      `;
+
+      messagesList.appendChild(container);
+      chatWelcome.style.display = "none";
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function assistantReply(input) {
+      const key = input.toLowerCase();
+      if (key.includes("resumen") || key.includes("orden")) return chatAnswers.resumen;
+      if (key.includes("preactiv")) return chatAnswers.preactivacion;
+      if (key.includes("checklist")) return chatAnswers.checklist;
+      return chatAnswers.default;
+    }
+
+    function sendMessage() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      addMessage("user", text);
+      chatInput.value = "";
+      chatInput.style.height = "28px";
+      sendBtn.disabled = true;
+      typingIndicator.classList.add("visible");
+
+      setTimeout(() => {
+        typingIndicator.classList.remove("visible");
+        addMessage("assistant", assistantReply(text));
+      }, 700);
+    }
+
+    sidebarToggle.addEventListener("click", () => {
+      sidebar.classList.toggle("open");
+      sidebarOverlay.classList.toggle("open");
+    });
+
+    sidebarOverlay.addEventListener("click", () => {
+      sidebar.classList.remove("open");
+      sidebarOverlay.classList.remove("open");
+    });
+
+    searchInput.addEventListener("input", (event) => {
+      const term = event.target.value.trim().toLowerCase();
+      clearSearch.classList.toggle("visible", term.length > 0);
+
+      filteredOrders = demoOrders.filter((order) => {
+        const full = `${order.wo_id} ${order.codigo_servicio} ${order.producto} ${order.actividad} ${order.cliente}`.toLowerCase();
+        return full.includes(term);
+      });
+
+      if (selectedOrder && !filteredOrders.some((o) => o.wo_id === selectedOrder.wo_id)) {
+        selectedOrder = filteredOrders[0] || null;
+      }
+
+      renderOrders();
+      renderDetail();
+    });
+
+    clearSearch.addEventListener("click", () => {
+      searchInput.value = "";
+      clearSearch.classList.remove("visible");
+      filteredOrders = [...demoOrders];
+      if (!selectedOrder) {
+        selectedOrder = demoOrders[0];
+      }
+      renderOrders();
+      renderDetail();
+    });
+
+    closeDetail.addEventListener("click", () => {
+      selectedOrder = null;
+      renderOrders();
+      renderDetail();
+    });
+
+    collapseOrders.addEventListener("click", () => {
+      isCollapsed = !isCollapsed;
+      ordersWrapper.classList.toggle("collapsed", isCollapsed);
+      collapseIcon.className = `fas ${isCollapsed ? "fa-chevron-right" : "fa-chevron-down"}`;
+    });
+
+    chatInput.addEventListener("input", () => {
+      sendBtn.disabled = chatInput.value.trim().length === 0;
+      chatInput.style.height = "28px";
+      chatInput.style.height = `${Math.min(chatInput.scrollHeight, 95)}px`;
+    });
+
+    chatInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+
+    sendBtn.addEventListener("click", sendMessage);
+
+    document.querySelectorAll("[data-suggest]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        chatInput.value = btn.getAttribute("data-suggest");
+        sendBtn.disabled = false;
+        sendMessage();
+      });
+    });
+
+    mobileChatToggle.addEventListener("click", () => {
+      chatOpenMobile = !chatOpenMobile;
+      chatSection.classList.toggle("open", chatOpenMobile);
+      mobileChatToggle.innerHTML = chatOpenMobile
+        ? '<i class="fas fa-times"></i>'
+        : '<i class="fas fa-comment-dots"></i>';
+    });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 900) {
+        chatOpenMobile = false;
+        chatSection.classList.remove("open");
+        mobileChatToggle.innerHTML = '<i class="fas fa-comment-dots"></i>';
+      }
+    });
+
+    renderOrders();
+    renderDetail();
+    searchCount.textContent = `${filteredOrders.length} de ${demoOrders.length} ordenes`;
+  </script>
+</body>
+</html>

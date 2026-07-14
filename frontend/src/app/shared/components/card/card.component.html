@@ -1,0 +1,39 @@
+<!-- ============================================
+VP SOLUTIONS - Card de Aplicación
+============================================ -->
+
+<div class="app-card" (click)="onView()">
+  <!-- Preview -->
+  <div class="card-preview">
+    <!-- Imagen -->
+    <img 
+      class="preview-image"
+      [src]="getImageUrl()"
+      [alt]="application.name"
+      loading="lazy">
+    
+    <!-- Overlay - siempre visible en hover -->
+    <div class="preview-overlay">
+      <div class="overlay-content">
+        <i class="fas fa-play-circle"></i>
+        <span>Iniciar Demo</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="card-content">
+    <div class="card-header">
+      <h3 class="card-title">{{ application.name }}</h3>
+      <span class="card-category">{{ application.category }}</span>
+    </div>
+
+    <p class="card-description">{{ application.description }}</p>
+
+    <div class="card-technologies">
+      <span *ngFor="let tech of application.technologies" class="tech-tag">
+        {{ tech }}
+      </span>
+    </div>
+  </div>
+</div>

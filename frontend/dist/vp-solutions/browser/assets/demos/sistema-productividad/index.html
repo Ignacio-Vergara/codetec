@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Productividad Agentes - Demo Portafolio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --blue-500: #3b82f6;
+      --green-500: #10b981;
+      --yellow-500: #f59e0b;
+      --red-500: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      line-height: 1.5;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--gray-200);
+      border-radius: 12px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      background: #fff;
+    }
+
+    .drop-zone:hover {
+      border-color: var(--gray-400);
+      background-color: var(--gray-50);
+    }
+
+    .mensaje-container {
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      max-height: 460px;
+      overflow-y: auto;
+    }
+
+    .mensaje-texto strong {
+      color: var(--gray-600);
+    }
+
+    .nav-tabs .nav-link {
+      color: var(--gray-500);
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+
+    .nav-tabs .nav-link:hover {
+      color: var(--gray-700);
+      border: none;
+    }
+
+    .nav-tabs .nav-link.active {
+      color: var(--gray-700);
+      font-weight: 500;
+      border-bottom: 2px solid var(--gray-500);
+      background: transparent;
+    }
+
+    .table {
+      font-size: 0.875rem;
+    }
+
+    .table td,
+    .table th {
+      padding: 0.75rem;
+      vertical-align: middle;
+    }
+
+    .demo-note {
+      border: 1px solid #fde68a;
+      background: #fffbeb;
+      color: #92400e;
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    .hidden-tab {
+      display: none;
+    }
+
+    @media (max-width: 991px) {
+      .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid px-4 py-4">
+    <header class="mb-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <i class="fas fa-chart-line fs-2" style="color: #6b7280;"></i>
+          <h1 class="h3 mb-0 fw-semibold" style="color: #374151;">Productividad Agentes</h1>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <span class="badge bg-secondary-subtle text-secondary-emphasis px-3 py-2">
+            <i class="fas fa-clock me-1"></i>Mínimo: 20/hora
+          </span>
+          <span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2">
+            <i class="fas fa-flask me-1"></i>Versión Demo
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <div class="demo-note mb-4">
+      Esta réplica utiliza datos ficticios para portafolio. No contiene información real de la empresa ni archivos sensibles.
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-header bg-white border-0 pt-4 pb-0">
+            <h5 class="card-title fw-semibold mb-0">
+              <i class="fas fa-upload me-2" style="color: #6b7280;"></i>Cargar Reporte
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="drop-zone" id="dropZone">
+              <div class="text-center py-4" id="dropZoneContent">
+                <i class="fas fa-file-excel fs-1 mb-3" style="color: #9ca3af;"></i>
+                <p class="mb-1 text-secondary">Arrastra tu archivo aquí</p>
+                <p class="small text-muted mb-0">o haz clic para seleccionar</p>
+                <p class="small text-muted mt-2">.xlsx, .xls (máx 15MB)</p>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-3">
+              <button class="btn btn-primary" type="button">
+                <i class="fas fa-calendar-day me-2"></i>Procesar (1 día)
+              </button>
+              <button class="btn btn-outline-secondary" type="button">
+                <i class="fas fa-calendar-week me-2"></i>Procesar (Múltiples días)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-header bg-white border-0 pt-4 pb-0">
+            <h5 class="card-title fw-semibold mb-0">
+              <i class="fas fa-clock me-2" style="color: #6b7280;"></i>Configuración
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="horaDemo" class="form-label small fw-medium text-secondary">Hora actual</label>
+              <div class="d-flex gap-2">
+                <select class="form-select w-auto" id="horaDemo">
+                  <option>12:00</option><option>13:00</option><option>14:00</option>
+                  <option>15:00</option><option selected>16:00</option><option>17:00</option>
+                  <option>18:00</option><option>19:00</option><option>20:00</option><option>21:00</option>
+                </select>
+                <button class="btn btn-sm btn-outline-secondary" type="button">
+                  <i class="fas fa-save me-1"></i>Configurar
+                </button>
+              </div>
+            </div>
+
+            <div class="small text-muted">
+              <div class="d-flex justify-content-between py-1">
+                <span>Hora actual:</span>
+                <span class="fw-medium">16:00</span>
+              </div>
+              <div class="d-flex justify-content-between py-1">
+                <span>Horas evaluadas:</span>
+                <span>12, 13, 14, 15, 16:00</span>
+              </div>
+              <div class="d-flex justify-content-between py-1">
+                <span>Horario laboral:</span>
+                <span>12:00 - 21:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+            <h5 class="card-title fw-semibold mb-0">
+              <i class="fas fa-history me-2" style="color: #6b7280;"></i>Recientes
+            </h5>
+            <button class="btn btn-sm btn-link text-secondary p-0" type="button">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+          <div class="card-body p-0">
+            <div class="list-group list-group-flush">
+              <div class="list-group-item border-0 py-2 px-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <p class="mb-0 small fw-medium">reporte_demo_10jul.xlsx</p>
+                    <p class="mb-0 small text-muted">10/07/2026 • 24 llamadas/hora</p>
+                  </div>
+                  <i class="fas fa-chevron-right text-muted small"></i>
+                </div>
+              </div>
+              <div class="list-group-item border-0 py-2 px-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <p class="mb-0 small fw-medium">reporte_demo_09jul.xlsx</p>
+                    <p class="mb-0 small text-muted">09/07/2026 • 22 llamadas/hora</p>
+                  </div>
+                  <i class="fas fa-chevron-right text-muted small"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white border-0 pt-4 pb-0">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+              <li class="nav-item">
+                <button class="nav-link active" data-tab="llamadas" type="button">
+                  <i class="fas fa-phone me-2"></i>Llamadas
+                </button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link" data-tab="minutos" type="button">
+                  <i class="fas fa-clock me-2"></i>Minutos
+                </button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link" data-tab="agentes" type="button">
+                  <i class="fas fa-users me-2"></i>Agentes
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div class="card-body p-4">
+            <section class="tab-pane-content" id="tab-llamadas">
+              <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                  <span class="badge bg-light text-secondary px-3 py-2">
+                    <i class="fas fa-calendar me-1"></i>10/07/2026
+                  </span>
+                  <span class="badge bg-light text-secondary ms-2 px-3 py-2">
+                    <i class="fas fa-chart-simple me-1"></i>Promedio: 24/hora
+                  </span>
+                </div>
+                <button class="btn btn-sm btn-outline-secondary" type="button">
+                  <i class="fas fa-copy me-1"></i>Copiar
+                </button>
+              </div>
+              <div class="mensaje-container p-3 bg-light rounded" style="border-left: 3px solid #6b7280;">
+                 <div class="mensaje-texto">📊 REPORTE LLAMADAS POR HORA 2026-07-10
+      🎯 Mínimo requerido: 20 llamadas/hora
+      🕐 Hora actual considerada: 16:00
+      ⚠️ 10 agente(s) con observaciones
+
+      1. Valentina Rojas
+        📉 Bajo mínimo (20): 13:00, 15:00:00
+        📊 Promedio: 18.8/hora
+
+      2. Mateo Silva
+        ⏰ Horas sin actividad: 14:00:00
+        📉 Bajo mínimo (20): 12:00, 16:00:00
+        📊 Promedio: 17.5/hora
+
+      3. Camila Torres
+        📉 Bajo mínimo (20): 12:00, 13:00, 14:00:00
+        📊 Promedio: 19.2/hora
+
+      4. Lucas Herrera
+        ⏰ Horas sin actividad: 16:00:00
+        📉 Bajo mínimo (20): 15:00:00
+        📊 Promedio: 16.9/hora
+
+      5. Sofia Mendez
+        📉 Bajo mínimo (20): 14:00, 15:00:00
+        📊 Promedio: 18.1/hora
+
+      6. Tomas Aguilar
+        ⏰ Horas sin actividad: 12:00:00
+        📉 Bajo mínimo (20): 13:00, 14:00:00
+        📊 Promedio: 17.7/hora
+
+      7. Martina Paredes
+        📉 Bajo mínimo (20): 12:00, 16:00:00
+        📊 Promedio: 19.0/hora
+
+      8. Bruno Salgado
+        ⏰ Horas sin actividad: 15:00:00
+        📉 Bajo mínimo (20): 13:00:00
+        📊 Promedio: 16.4/hora
+
+      9. Renata Quiroga
+        📉 Bajo mínimo (20): 14:00:00
+        📊 Promedio: 19.6/hora
+
+      10. Diego Acosta
+        ⏰ Horas sin actividad: 13:00:00
+        📉 Bajo mínimo (20): 12:00, 15:00:00
+        📊 Promedio: 17.2/hora
+
+      🔍 Priorizar revisión con estos agentes</div>
+              </div>
+            </section>
+
+            <section class="tab-pane-content hidden-tab" id="tab-minutos">
+              <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                  <span class="badge bg-light text-secondary px-3 py-2">
+                    <i class="fas fa-calendar me-1"></i>10/07/2026
+                  </span>
+                </div>
+                <button class="btn btn-sm btn-outline-secondary" type="button">
+                  <i class="fas fa-copy me-1"></i>Copiar
+                </button>
+              </div>
+              <div class="mensaje-container p-3 bg-light rounded" style="border-left: 3px solid #6b7280;">
+                 <div class="mensaje-texto">⏱️ REPORTE MINUTOS TRABAJADOS 2026-07-10
+      🎯 Análisis por hora de minutos efectivos
+      🕐 Hora actual considerada: 16:00
+      📊 10 agente(s) con actividad registrada
+
+      1. Valentina Rojas
+        ⏱️ Minutos por hora: 12:00 (44min), 13:00 (58min), 14:00 (61min), 15:00 (63min), 16:00 (52min)
+        📞 Llamadas: 94 | ⏰ Minutos totales: 278
+
+      2. Mateo Silva
+        ⏱️ Minutos por hora: 12:00 (39min), 13:00 (54min), 14:00 (0.5min), 15:00 (66min), 16:00 (49min)
+        📞 Llamadas: 88 | ⏰ Minutos totales: 208.5
+
+      3. Camila Torres
+        ⏱️ Minutos por hora: 12:00 (41min), 13:00 (47min), 14:00 (56min), 15:00 (59min), 16:00 (46min)
+        📞 Llamadas: 82 | ⏰ Minutos totales: 249
+
+      4. Lucas Herrera
+        ⏱️ Minutos por hora: 12:00 (38min), 13:00 (52min), 14:00 (57min), 15:00 (60min)
+        📞 Llamadas: 76 | ⏰ Minutos totales: 207
+
+      5. Sofia Mendez
+        ⏱️ Minutos por hora: 12:00 (43min), 13:00 (49min), 14:00 (51min), 15:00 (55min), 16:00 (48min)
+        📞 Llamadas: 79 | ⏰ Minutos totales: 246
+
+      6. Tomas Aguilar
+        ⏱️ Minutos por hora: 13:00 (45min), 14:00 (53min), 15:00 (57min), 16:00 (50min)
+        📞 Llamadas: 71 | ⏰ Minutos totales: 205
+
+      7. Martina Paredes
+        ⏱️ Minutos por hora: 12:00 (40min), 13:00 (48min), 14:00 (55min), 15:00 (58min), 16:00 (47min)
+        📞 Llamadas: 74 | ⏰ Minutos totales: 248
+
+      8. Bruno Salgado
+        ⏱️ Minutos por hora: 12:00 (36min), 13:00 (43min), 14:00 (50min), 16:00 (44min)
+        📞 Llamadas: 67 | ⏰ Minutos totales: 173
+
+      9. Renata Quiroga
+        ⏱️ Minutos por hora: 12:00 (42min), 13:00 (50min), 14:00 (52min), 15:00 (56min), 16:00 (45min)
+        📞 Llamadas: 78 | ⏰ Minutos totales: 245
+
+      10. Diego Acosta
+        ⏱️ Minutos por hora: 12:00 (37min), 14:00 (51min), 15:00 (54min), 16:00 (46min)
+        📞 Llamadas: 70 | ⏰ Minutos totales: 188
+
+      🔍 Revisar distribución de minutos por agente</div>
+              </div>
+            </section>
+
+            <section class="tab-pane-content hidden-tab" id="tab-agentes">
+              <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Agente</th>
+                      <th class="text-end">Llamadas</th>
+                      <th class="text-end">Minutos</th>
+                      <th class="text-end">Promedio</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="fw-medium">Agente Demo 01</td>
+                      <td class="text-end">86</td>
+                      <td class="text-end">275</td>
+                      <td class="text-end text-success">28</td>
+                      <td><span class="badge bg-success-subtle text-success-emphasis" style="font-size: 0.7rem;">Optimo</span></td>
+                    </tr>
+                    <tr>
+                      <td class="fw-medium">Agente Demo 02</td>
+                      <td class="text-end">74</td>
+                      <td class="text-end">251</td>
+                      <td class="text-end text-warning">21</td>
+                      <td><span class="badge bg-warning-subtle text-warning-emphasis" style="font-size: 0.7rem;">Bajo rendimiento</span></td>
+                    </tr>
+                    <tr>
+                      <td class="fw-medium">Agente Demo 03</td>
+                      <td class="text-end">62</td>
+                      <td class="text-end">226</td>
+                      <td class="text-end text-danger">18</td>
+                      <td><span class="badge bg-danger-subtle text-danger-emphasis" style="font-size: 0.7rem;">2h sin actividad</span></td>
+                    </tr>
+                    <tr>
+                      <td class="fw-medium">Agente Demo 04</td>
+                      <td class="text-end">81</td>
+                      <td class="text-end">260</td>
+                      <td class="text-end text-success">26</td>
+                      <td><span class="badge bg-success-subtle text-success-emphasis" style="font-size: 0.7rem;">Optimo</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+              <button class="btn btn-sm btn-outline-secondary" type="button">
+                <i class="fas fa-download me-1"></i>Exportar JSON
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" type="button">
+                <i class="fas fa-trash-alt me-1"></i>Limpiar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tabButtons = document.querySelectorAll('[data-tab]');
+      var panes = document.querySelectorAll('.tab-pane-content');
+
+      tabButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          var target = button.getAttribute('data-tab');
+
+          tabButtons.forEach(function (btn) {
+            btn.classList.remove('active');
+          });
+          button.classList.add('active');
+
+          panes.forEach(function (pane) {
+            pane.classList.add('hidden-tab');
+          });
+
+          var selectedPane = document.getElementById('tab-' + target);
+          if (selectedPane) {
+            selectedPane.classList.remove('hidden-tab');
+          }
+        });
+      });
+
+      var dropZone = document.getElementById('dropZone');
+      var content = document.getElementById('dropZoneContent');
+
+      dropZone.addEventListener('click', function () {
+        content.innerHTML = '<i class="fas fa-file-excel fs-1 mb-3" style="color: #10b981;"></i>' +
+          '<p class="mb-1 fw-medium">reporte_demo_portafolio.xlsx</p>' +
+          '<p class="small text-muted mb-0">Archivo simulado listo para procesar</p>';
+      });
+    })();
+  </script>
+</body>
+</html>

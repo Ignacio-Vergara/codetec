@@ -1,0 +1,1228 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Agentes - Demo Portafolio</title>
+  <style>
+    :root {
+      --bg-app: #f5f7fa;
+      --bg-card: #ffffff;
+      --bg-sidebar-1: #1a2c3e;
+      --bg-sidebar-2: #0f1a24;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --danger: #dc2626;
+      --warning: #f59e0b;
+      --success: #16a34a;
+      --border: #e2e8f0;
+      --shadow-soft: 0 14px 40px rgba(15, 23, 42, 0.08);
+      --radius-card: 18px;
+      --radius-pill: 999px;
+      --sidebar-w: 260px;
+      --sidebar-collapsed: 70px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: "Segoe UI", "SF Pro Text", "Helvetica Neue", sans-serif;
+      background: radial-gradient(circle at 10% 10%, #eef6ff 0, transparent 30%),
+                  radial-gradient(circle at 85% 0, #e7fff8 0, transparent 25%),
+                  var(--bg-app);
+      color: var(--text-main);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: var(--sidebar-w);
+      background: linear-gradient(180deg, var(--bg-sidebar-1) 0%, var(--bg-sidebar-2) 100%);
+      color: #fff;
+      transition: width 0.3s ease, transform 0.3s ease;
+      z-index: 1000;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.sidebar-collapsed .sidebar {
+      width: var(--sidebar-collapsed);
+    }
+
+    .toggle-btn {
+      position: absolute;
+      top: 20px;
+      right: -12px;
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: #fff;
+      color: var(--bg-sidebar-1);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-btn:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .logo-container {
+      padding: 22px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .logo-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+
+    .logo-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #60a5fa, #2563eb);
+      display: inline-grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.35);
+    }
+
+    .menu-container {
+      flex: 1;
+      padding: 0 12px;
+      overflow: auto;
+    }
+
+    .nav {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 4px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: rgba(255, 255, 255, 0.74);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .nav-link.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .nav-link.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .nav-icon {
+      width: 24px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .nav-label {
+      flex: 1;
+      white-space: nowrap;
+    }
+
+    .badge-construction {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      text-align: center;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 12px;
+    }
+
+    body.sidebar-collapsed .logo-label,
+    body.sidebar-collapsed .nav-label,
+    body.sidebar-collapsed .badge-construction,
+    body.sidebar-collapsed .sidebar-footer {
+      display: none;
+    }
+
+    .main-content {
+      margin-left: var(--sidebar-w);
+      min-height: 100vh;
+      transition: margin-left 0.3s ease;
+      padding: 24px;
+    }
+
+    body.sidebar-collapsed .main-content {
+      margin-left: var(--sidebar-collapsed);
+    }
+
+    .demo-banner {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      background: linear-gradient(90deg, #fff7ed, #ffedd5);
+      border: 1px solid #fed7aa;
+      color: #9a3412;
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .section-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      box-shadow: var(--shadow-soft);
+      border-radius: var(--radius-card);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .section-body {
+      padding: 16px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid.four {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .input,
+    .button,
+    .select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      height: 40px;
+      padding: 0 12px;
+      font-size: 14px;
+      color: var(--text-main);
+      background: #fff;
+    }
+
+    .button {
+      cursor: pointer;
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .button:hover {
+      background: var(--primary-dark);
+      border-color: var(--primary-dark);
+    }
+
+    .button.secondary {
+      background: #fff;
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+
+    .button.secondary:hover {
+      background: #fef2f2;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tab {
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 11px 16px;
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab:hover {
+      background: rgba(37, 99, 235, 0.14);
+      color: #1e40af;
+    }
+
+    .tab.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 18px 40px rgba(37, 99, 235, 0.18);
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 22px;
+      color: #1a2c3e;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 13px;
+      background: #fff;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 950px;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #1e293b;
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    td.sticky,
+    th.sticky {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: #fff;
+      text-align: left;
+      font-weight: 700;
+    }
+
+    th.sticky {
+      background: #f8fafc;
+      z-index: 3;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .cell-normal {
+      background: #ffffff;
+    }
+
+    .cell-warning {
+      background: #fff3cd;
+      color: #7c5c00;
+    }
+
+    .cell-danger {
+      background: #f8d7da;
+      color: #7f1d1d;
+      font-weight: 700;
+    }
+
+    .text-danger {
+      color: var(--danger);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 12px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .metric-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      background: #fff;
+    }
+
+    .metric-card.red {
+      background: rgba(220, 38, 38, 0.08);
+      border-color: rgba(220, 38, 38, 0.35);
+    }
+
+    .metric-card.blue {
+      background: rgba(37, 99, 235, 0.08);
+      border-color: rgba(37, 99, 235, 0.35);
+    }
+
+    .metric-card.amber {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+
+    .metric-value {
+      margin: 0;
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .metric-label {
+      margin-top: 6px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .bars {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 200px 1fr 60px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bar-label {
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: var(--radius-pill);
+      background: #eef2ff;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(90deg, #2563eb, #60a5fa);
+    }
+
+    .bar-fill.red {
+      background: linear-gradient(90deg, #dc2626, #f87171);
+    }
+
+    .bar-value {
+      text-align: right;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .module-placeholder {
+      padding: 34px 18px;
+      text-align: center;
+      color: var(--text-muted);
+      border: 1px dashed #cbd5e1;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #fff, #f8fafc);
+      margin-top: 6px;
+    }
+
+    .footer-note {
+      margin-top: 12px;
+      color: var(--text-muted);
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .grid.four {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid.three {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .bar-row {
+        grid-template-columns: 140px 1fr 56px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      body.sidebar-open .sidebar {
+        transform: translateX(0);
+      }
+
+      .main-content,
+      body.sidebar-collapsed .main-content {
+        margin-left: 0;
+        padding: 14px;
+      }
+
+      .mobile-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .mobile-menu-btn {
+        border: 1px solid var(--border);
+        background: #fff;
+        border-radius: 10px;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+      }
+
+      .grid.two,
+      .grid.three,
+      .grid.four {
+        grid-template-columns: 1fr;
+      }
+
+      .demo-banner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <button class="toggle-btn" id="toggleSidebar" aria-label="Colapsar sidebar">&#8249;</button>
+    <div class="logo-container">
+      <div class="logo-mark">
+        <span class="logo-badge">DA</span>
+        <span class="logo-label">Dashboard Agentes</span>
+      </div>
+    </div>
+
+    <div class="menu-container">
+      <ul class="nav">
+        <li><a class="nav-link active" data-module="ict"><span class="nav-icon">📊</span><span class="nav-label">ICT</span></a></li>
+        <li><a class="nav-link" data-module="llamadas"><span class="nav-icon">📞</span><span class="nav-label">Llamadas</span></a></li>
+        <li><a class="nav-link" data-module="inbound"><span class="nav-icon">📥</span><span class="nav-label">Inbound</span></a></li>
+        <li><a class="nav-link disabled"><span class="nav-icon">🛠️</span><span class="nav-label">Nuevos módulos</span><span class="badge-construction">Pronto</span></a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar-footer">v1.0.0 demo</div>
+  </aside>
+
+  <main class="main-content">
+    <div class="mobile-top">
+      <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+      <strong>Dashboard Agentes</strong>
+    </div>
+
+    <div class="demo-banner">
+      <div><strong>Modo Portafolio:</strong> Esta réplica usa datos inventados para demostración.</div>
+      <div>Actualizado: 11/07/2026</div>
+    </div>
+
+    <section class="section-card">
+      <div class="section-body grid three">
+        <div>
+          <label class="label">📂 Cargar Archivo ICT</label>
+          <input class="input" type="text" value="demo_ict_julio_2026.xlsx" readonly>
+        </div>
+        <div>
+          <label class="label">📅 Desde</label>
+          <input class="input" type="date" id="fechaDesde" value="2026-07-01">
+        </div>
+        <div>
+          <label class="label">📅 Hasta</label>
+          <input class="input" type="date" id="fechaHasta" value="2026-07-11">
+        </div>
+      </div>
+      <div class="section-body grid two" style="padding-top: 0;">
+        <button class="button" id="btnBuscar">🔍 Buscar</button>
+        <button class="button secondary">🗑️ Limpiar datos</button>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <div class="section-body">
+        <div class="tabs" id="tabsMainModule">
+          <button class="tab active" data-tab="tipificaciones">📞 Tipificaciones por Hora</button>
+          <button class="tab" data-tab="detalles">📊 Análisis por Resultado</button>
+          <button class="tab" data-tab="incumplimiento">⚠️ No Cumple Agenda</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="module-ict">
+      <div class="tab-panel" data-panel="tipificaciones">
+        <section class="section-card">
+          <div class="section-body">
+            <div class="toolbar">
+              <h1 class="title">📊 ICT - Tipificaciones por Hora</h1>
+              <div class="badge" id="totalRegistrosBadge">📈 Total registros: 0</div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="sticky">Agente</th>
+                    <th>08:00</th>
+                    <th>09:00</th>
+                    <th>10:00</th>
+                    <th>11:00</th>
+                    <th>12:00</th>
+                    <th>13:00</th>
+                    <th>14:00</th>
+                    <th>15:00</th>
+                    <th>16:00</th>
+                    <th>17:00</th>
+                    <th>Promedio</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody id="tablaTipificacionesBody"></tbody>
+              </table>
+            </div>
+
+            <div class="legend">
+              <span>✓ Normal</span>
+              <span>⚠️ Bajo promedio</span>
+              <span>🔴 Sin actividad</span>
+              <span>📌 No Aplica (sin agente asignado)</span>
+            </div>
+            <div class="footer-note" id="rangoFechasLabel"></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="tab-panel hidden" data-panel="detalles">
+        <section class="section-card">
+          <div class="section-body">
+            <div class="toolbar">
+              <h1 class="title">📊 Análisis por Resultado - ICT</h1>
+              <div class="badge" id="resumenResultados">🚫 Anulaciones: 0 | 🔄 Derivaciones/Reagendamientos: 0</div>
+            </div>
+
+            <div class="grid two">
+              <div class="metric-card red">
+                <h3 style="margin:0 0 10px 0;">Anulaciones por detalle</h3>
+                <div class="bars" id="barsAnulaciones"></div>
+              </div>
+              <div class="metric-card amber">
+                <h3 style="margin:0 0 10px 0;">Derivación/Reagendamiento por detalle</h3>
+                <div class="bars" id="barsDerivaciones"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="tab-panel hidden" data-panel="incumplimiento">
+        <section class="section-card">
+          <div class="section-body">
+            <div class="grid four" id="metricasIncumplimiento"></div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-body">
+            <h3 style="margin: 0 0 12px 0;">Top técnicos con más "No cumple agenda"</h3>
+            <div class="bars" id="barsNoCumple"></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="module-llamadas" class="hidden">
+      <section class="section-card">
+        <div class="section-body">
+          <div class="toolbar">
+            <h2 style="margin-top: 0; margin-bottom: 0;">📞 Llamadas por Hora</h2>
+            <div class="badge" id="badgeLlamadasResumen">🎯 Minimo esperado: 6 llamadas/hora</div>
+          </div>
+
+          <div class="grid four" id="metricasLlamadas"></div>
+
+          <div class="table-wrap" style="margin-top: 12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th class="sticky">Agente</th>
+                  <th>08:00</th>
+                  <th>09:00</th>
+                  <th>10:00</th>
+                  <th>11:00</th>
+                  <th>12:00</th>
+                  <th>13:00</th>
+                  <th>14:00</th>
+                  <th>15:00</th>
+                  <th>16:00</th>
+                  <th>17:00</th>
+                  <th>Promedio</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody id="tablaLlamadasBody"></tbody>
+            </table>
+          </div>
+
+          <div class="legend">
+            <span>✓ Cumple minimo</span>
+            <span>⚠️ Bajo minimo esperado</span>
+            <span>🔴 Sin actividad</span>
+            <span>🍽️ Franja de almuerzo</span>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section id="module-inbound" class="hidden">
+      <section class="section-card">
+        <div class="section-body">
+          <div class="toolbar">
+            <h2 style="margin-top: 0; margin-bottom: 0;">📥 Inbound</h2>
+            <div class="badge" id="badgeInboundTotal">📬 Total gestiones inbound: 0</div>
+          </div>
+
+          <div class="grid three" id="metricasInbound"></div>
+
+          <div class="grid two" style="margin-top: 12px;">
+            <div class="metric-card blue">
+              <h3 style="margin:0 0 10px 0;">Distribucion por canal</h3>
+              <div class="bars" id="barsInboundCanal"></div>
+            </div>
+            <div class="metric-card amber">
+              <h3 style="margin:0 0 10px 0;">SLA por cola</h3>
+              <div class="bars" id="barsInboundSla"></div>
+            </div>
+          </div>
+
+          <div class="table-wrap" style="margin-top: 12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th class="sticky">Especialista</th>
+                  <th>Tickets</th>
+                  <th>Llamadas</th>
+                  <th>Chats</th>
+                  <th>Total</th>
+                  <th>SLA</th>
+                  <th>CSAT</th>
+                </tr>
+              </thead>
+              <tbody id="tablaInboundBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const demoData = {
+      horas: ["08", "09", "10", "11", "12", "13", "14", "15", "16", "17"],
+      agentes: [
+        { nombre: "Ana M.", horas: [4, 6, 7, 8, 6, 4, 7, 8, 7, 6] },
+        { nombre: "Bruno R.", horas: [5, 5, 6, 7, 4, 3, 6, 7, 6, 5] },
+        { nombre: "Carla V.", horas: [3, 4, 5, 6, 5, 2, 6, 6, 5, 4] },
+        { nombre: "Diego P.", horas: [6, 7, 8, 9, 7, 5, 8, 9, 8, 7] },
+        { nombre: "No Aplica", horas: [1, 0, 1, 0, 0, 0, 1, 1, 0, 1] }
+      ],
+      anulaciones: [
+        { label: "Cliente desiste", value: 38 },
+        { label: "Cobertura no disponible", value: 24 },
+        { label: "Error de agenda", value: 16 },
+        { label: "Solicitud duplicada", value: 11 }
+      ],
+      derivaciones: [
+        { label: "Reagenda cliente", value: 29 },
+        { label: "Deriva a soporte", value: 21 },
+        { label: "Visita técnica", value: 15 },
+        { label: "Validación comercial", value: 9 }
+      ],
+      noCumpleAgenda: [
+        { tecnico: "Tecnico 01", cantidad: 19 },
+        { tecnico: "Tecnico 02", cantidad: 17 },
+        { tecnico: "Tecnico 03", cantidad: 14 },
+        { tecnico: "Tecnico 04", cantidad: 12 },
+        { tecnico: "Tecnico 05", cantidad: 10 },
+        { tecnico: "Tecnico 06", cantidad: 8 },
+        { tecnico: "Tecnico 07", cantidad: 7 }
+      ],
+      llamadas: [
+        { nombre: "Sofia G.", horas: [7, 8, 9, 8, 6, 4, 8, 9, 8, 7], almuerzo: "13" },
+        { nombre: "Matias L.", horas: [6, 7, 8, 7, 6, 3, 7, 8, 7, 6], almuerzo: "13" },
+        { nombre: "Valentina C.", horas: [5, 6, 7, 6, 5, 2, 6, 7, 6, 5], almuerzo: "13" },
+        { nombre: "Javier N.", horas: [8, 9, 10, 9, 7, 5, 9, 10, 9, 8], almuerzo: "13" },
+        { nombre: "Paula D.", horas: [4, 5, 6, 6, 5, 2, 5, 6, 6, 5], almuerzo: "13" }
+      ],
+      inboundEspecialistas: [
+        { nombre: "Camila T.", tickets: 34, llamadas: 18, chats: 25, sla: 96, csat: 94 },
+        { nombre: "Rodrigo F.", tickets: 29, llamadas: 22, chats: 19, sla: 92, csat: 91 },
+        { nombre: "Daniela K.", tickets: 31, llamadas: 16, chats: 28, sla: 95, csat: 93 },
+        { nombre: "Esteban Q.", tickets: 25, llamadas: 20, chats: 17, sla: 89, csat: 88 },
+        { nombre: "Monica A.", tickets: 27, llamadas: 19, chats: 21, sla: 93, csat: 90 }
+      ],
+      inboundCanales: [
+        { label: "Tickets web", value: 146 },
+        { label: "Llamadas entrantes", value: 95 },
+        { label: "Chat en linea", value: 110 }
+      ],
+      inboundSlaColas: [
+        { label: "Soporte tecnico", value: 94 },
+        { label: "Facturacion", value: 91 },
+        { label: "Retenciones", value: 88 },
+        { label: "Altas y bajas", value: 96 }
+      ]
+    };
+
+    const state = {
+      sortAsc: false,
+      activeTab: "tipificaciones",
+      activeModule: "ict"
+    };
+
+    function totalRegistros() {
+      return demoData.agentes
+        .flatMap((a) => a.horas)
+        .reduce((acc, n) => acc + n, 0);
+    }
+
+    function promedio(arr) {
+      const sum = arr.reduce((acc, n) => acc + n, 0);
+      return (sum / arr.length).toFixed(1);
+    }
+
+    function claseCelda(valor, prom) {
+      if (valor === 0) return "cell-danger";
+      if (valor < prom) return "cell-warning";
+      return "cell-normal";
+    }
+
+    function renderTablaTipificaciones() {
+      const body = document.getElementById("tablaTipificacionesBody");
+      const agentes = [...demoData.agentes].sort((a, b) => {
+        const pa = Number(promedio(a.horas));
+        const pb = Number(promedio(b.horas));
+        return state.sortAsc ? pa - pb : pb - pa;
+      });
+
+      const promedioGlobal = demoData.agentes
+        .reduce((acc, a) => acc + Number(promedio(a.horas)), 0) / demoData.agentes.length;
+
+      body.innerHTML = "";
+
+      agentes.forEach((agente) => {
+        const tr = document.createElement("tr");
+        const total = agente.horas.reduce((acc, n) => acc + n, 0);
+        const avg = promedio(agente.horas);
+
+        const tdNombre = document.createElement("td");
+        tdNombre.className = "sticky";
+        tdNombre.innerHTML = agente.nombre === "No Aplica"
+          ? '<span class="text-danger">No Aplica</span> <span class="badge">Sin asignar</span>'
+          : agente.nombre;
+        tr.appendChild(tdNombre);
+
+        agente.horas.forEach((h) => {
+          const td = document.createElement("td");
+          td.className = claseCelda(h, promedioGlobal);
+          td.textContent = String(h);
+          tr.appendChild(td);
+        });
+
+        const tdAvg = document.createElement("td");
+        tdAvg.textContent = avg;
+        tdAvg.className = Number(avg) < promedioGlobal ? "cell-warning" : "cell-normal";
+        tr.appendChild(tdAvg);
+
+        const tdTotal = document.createElement("td");
+        tdTotal.textContent = String(total);
+        tdTotal.style.fontWeight = "700";
+        tr.appendChild(tdTotal);
+
+        body.appendChild(tr);
+      });
+
+      const tFoot = document.createElement("tr");
+      tFoot.style.background = "#e2e8f0";
+      tFoot.style.fontWeight = "700";
+
+      const tdLabel = document.createElement("td");
+      tdLabel.className = "sticky";
+      tdLabel.textContent = "Total por hora";
+      tFoot.appendChild(tdLabel);
+
+      demoData.horas.forEach((_, idx) => {
+        const totalHora = demoData.agentes.reduce((acc, a) => acc + a.horas[idx], 0);
+        const td = document.createElement("td");
+        td.textContent = String(totalHora);
+        tFoot.appendChild(td);
+      });
+
+      const tdAvg = document.createElement("td");
+      tdAvg.textContent = promedioGlobal.toFixed(1);
+      tdAvg.style.background = "#2563eb";
+      tdAvg.style.color = "#fff";
+      tFoot.appendChild(tdAvg);
+
+      const tdTotal = document.createElement("td");
+      tdTotal.textContent = String(totalRegistros());
+      tdTotal.style.background = "#2563eb";
+      tdTotal.style.color = "#fff";
+      tFoot.appendChild(tdTotal);
+
+      body.appendChild(tFoot);
+      document.getElementById("totalRegistrosBadge").textContent = "📈 Total registros: " + totalRegistros();
+    }
+
+    function renderBars(targetId, data, maxRef, red) {
+      const target = document.getElementById(targetId);
+      target.innerHTML = "";
+
+      data.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "bar-row";
+
+        const label = document.createElement("div");
+        label.className = "bar-label";
+        label.textContent = item.label || item.tecnico;
+
+        const track = document.createElement("div");
+        track.className = "bar-track";
+
+        const fill = document.createElement("div");
+        fill.className = "bar-fill" + (red ? " red" : "");
+        fill.style.width = ((item.value || item.cantidad) / maxRef) * 100 + "%";
+        track.appendChild(fill);
+
+        const value = document.createElement("div");
+        value.className = "bar-value";
+        value.textContent = String(item.value || item.cantidad);
+
+        row.appendChild(label);
+        row.appendChild(track);
+        row.appendChild(value);
+        target.appendChild(row);
+      });
+    }
+
+    function renderDetalles() {
+      const totalAn = demoData.anulaciones.reduce((acc, i) => acc + i.value, 0);
+      const totalDe = demoData.derivaciones.reduce((acc, i) => acc + i.value, 0);
+      document.getElementById("resumenResultados").textContent = "🚫 Anulaciones: " + totalAn + " | 🔄 Derivaciones/Reagendamientos: " + totalDe;
+      renderBars("barsAnulaciones", demoData.anulaciones, Math.max(...demoData.anulaciones.map((d) => d.value)), true);
+      renderBars("barsDerivaciones", demoData.derivaciones, Math.max(...demoData.derivaciones.map((d) => d.value)), false);
+    }
+
+    function renderIncumplimiento() {
+      const total = demoData.noCumpleAgenda.reduce((acc, i) => acc + i.cantidad, 0);
+      const tecnicos = demoData.noCumpleAgenda.length;
+      const porcentaje = ((total / Math.max(totalRegistros(), 1)) * 100).toFixed(1);
+      const promedioTecnico = (total / Math.max(tecnicos, 1)).toFixed(1);
+
+      const metricas = [
+        { cls: "red", value: total, label: "Total Incumplimientos" },
+        { cls: "blue", value: tecnicos, label: "Tecnicos con incumplimientos" },
+        { cls: "amber", value: porcentaje + "%", label: "% sobre total gestiones" },
+        { cls: "blue", value: promedioTecnico, label: "Promedio por tecnico" }
+      ];
+
+      const target = document.getElementById("metricasIncumplimiento");
+      target.innerHTML = "";
+      metricas.forEach((m) => {
+        const card = document.createElement("div");
+        card.className = "metric-card " + m.cls;
+        card.innerHTML = '<p class="metric-value">' + m.value + '</p><div class="metric-label">' + m.label + '</div>';
+        target.appendChild(card);
+      });
+
+      renderBars("barsNoCumple", demoData.noCumpleAgenda, Math.max(...demoData.noCumpleAgenda.map((d) => d.cantidad)), true);
+    }
+
+    function setRangoFechas() {
+      const desde = document.getElementById("fechaDesde").value;
+      const hasta = document.getElementById("fechaHasta").value;
+      const texto = "Rango: " + desde.split("-").reverse().join("/") + " - " + hasta.split("-").reverse().join("/");
+      document.getElementById("rangoFechasLabel").textContent = texto;
+    }
+
+    function renderLlamadas() {
+      const minimoEsperado = 6;
+      const target = document.getElementById("tablaLlamadasBody");
+      target.innerHTML = "";
+
+      let totalGeneral = 0;
+      demoData.llamadas.forEach((agente) => {
+        const total = agente.horas.reduce((acc, n) => acc + n, 0);
+        const avg = (total / agente.horas.length).toFixed(1);
+        totalGeneral += total;
+
+        const tr = document.createElement("tr");
+        const tdNombre = document.createElement("td");
+        tdNombre.className = "sticky";
+        tdNombre.innerHTML = agente.nombre + ' <span class="badge">🍽️ ' + agente.almuerzo + ':00</span>';
+        tr.appendChild(tdNombre);
+
+        agente.horas.forEach((valor, idx) => {
+          const td = document.createElement("td");
+          if (demoData.horas[idx] === agente.almuerzo) {
+            td.className = "cell-warning";
+          } else if (valor === 0) {
+            td.className = "cell-danger";
+          } else if (valor < minimoEsperado) {
+            td.className = "cell-warning";
+          } else {
+            td.className = "cell-normal";
+          }
+          td.textContent = String(valor);
+          tr.appendChild(td);
+        });
+
+        const tdAvg = document.createElement("td");
+        tdAvg.textContent = avg;
+        tdAvg.className = Number(avg) < minimoEsperado ? "cell-warning" : "cell-normal";
+        tr.appendChild(tdAvg);
+
+        const tdTotal = document.createElement("td");
+        tdTotal.textContent = String(total);
+        tdTotal.style.fontWeight = "700";
+        tr.appendChild(tdTotal);
+
+        target.appendChild(tr);
+      });
+
+      const horasEvaluadas = demoData.horas.length;
+      const metricas = [
+        { cls: "blue", value: demoData.llamadas.length, label: "Agentes" },
+        { cls: "amber", value: horasEvaluadas, label: "Horas evaluadas" },
+        { cls: "blue", value: "17:00", label: "Hora de corte" },
+        { cls: "red", value: totalGeneral, label: "Total llamadas" }
+      ];
+
+      const metricasTarget = document.getElementById("metricasLlamadas");
+      metricasTarget.innerHTML = "";
+      metricas.forEach((m) => {
+        const card = document.createElement("div");
+        card.className = "metric-card " + m.cls;
+        card.innerHTML = '<p class="metric-value">' + m.value + '</p><div class="metric-label">' + m.label + '</div>';
+        metricasTarget.appendChild(card);
+      });
+    }
+
+    function renderInbound() {
+      const table = document.getElementById("tablaInboundBody");
+      table.innerHTML = "";
+
+      let totalGestiones = 0;
+      let promedioSla = 0;
+      let promedioCsat = 0;
+
+      demoData.inboundEspecialistas.forEach((esp) => {
+        const total = esp.tickets + esp.llamadas + esp.chats;
+        totalGestiones += total;
+        promedioSla += esp.sla;
+        promedioCsat += esp.csat;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML =
+          '<td class="sticky">' + esp.nombre + '</td>' +
+          '<td>' + esp.tickets + '</td>' +
+          '<td>' + esp.llamadas + '</td>' +
+          '<td>' + esp.chats + '</td>' +
+          '<td style="font-weight:700;">' + total + '</td>' +
+          '<td class="' + (esp.sla < 90 ? "cell-warning" : "cell-normal") + '">' + esp.sla + '%</td>' +
+          '<td class="' + (esp.csat < 90 ? "cell-warning" : "cell-normal") + '">' + esp.csat + '%</td>';
+        table.appendChild(tr);
+      });
+
+      promedioSla = (promedioSla / demoData.inboundEspecialistas.length).toFixed(1);
+      promedioCsat = (promedioCsat / demoData.inboundEspecialistas.length).toFixed(1);
+      document.getElementById("badgeInboundTotal").textContent = "📬 Total gestiones inbound: " + totalGestiones;
+
+      const metricas = [
+        { cls: "blue", value: demoData.inboundEspecialistas.length, label: "Especialistas activos" },
+        { cls: "amber", value: promedioSla + "%", label: "SLA promedio" },
+        { cls: "red", value: promedioCsat + "%", label: "CSAT promedio" }
+      ];
+
+      const metricasTarget = document.getElementById("metricasInbound");
+      metricasTarget.innerHTML = "";
+      metricas.forEach((m) => {
+        const card = document.createElement("div");
+        card.className = "metric-card " + m.cls;
+        card.innerHTML = '<p class="metric-value">' + m.value + '</p><div class="metric-label">' + m.label + '</div>';
+        metricasTarget.appendChild(card);
+      });
+
+      renderBars(
+        "barsInboundCanal",
+        demoData.inboundCanales,
+        Math.max(...demoData.inboundCanales.map((d) => d.value)),
+        false
+      );
+      renderBars(
+        "barsInboundSla",
+        demoData.inboundSlaColas,
+        100,
+        false
+      );
+    }
+
+    function setupTabs() {
+      document.querySelectorAll("#tabsMainModule .tab").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#tabsMainModule .tab").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          state.activeTab = btn.dataset.tab;
+
+          document.querySelectorAll("#module-ict .tab-panel").forEach((panel) => {
+            panel.classList.toggle("hidden", panel.dataset.panel !== state.activeTab);
+          });
+        });
+      });
+    }
+
+    function setupSidebarAndModules() {
+      document.getElementById("toggleSidebar").addEventListener("click", () => {
+        document.body.classList.toggle("sidebar-collapsed");
+        const isCollapsed = document.body.classList.contains("sidebar-collapsed");
+        document.getElementById("toggleSidebar").innerHTML = isCollapsed ? "&#8250;" : "&#8249;";
+      });
+
+      document.getElementById("mobileMenuBtn").addEventListener("click", () => {
+        document.body.classList.toggle("sidebar-open");
+      });
+
+      document.querySelectorAll(".nav-link[data-module]").forEach((link) => {
+        link.addEventListener("click", () => {
+          document.querySelectorAll(".nav-link[data-module]").forEach((l) => l.classList.remove("active"));
+          link.classList.add("active");
+
+          const module = link.dataset.module;
+          state.activeModule = module;
+
+          document.getElementById("module-ict").classList.toggle("hidden", module !== "ict");
+          document.getElementById("module-llamadas").classList.toggle("hidden", module !== "llamadas");
+          document.getElementById("module-inbound").classList.toggle("hidden", module !== "inbound");
+
+          if (window.innerWidth <= 768) {
+            document.body.classList.remove("sidebar-open");
+          }
+        });
+      });
+    }
+
+    function setupFilters() {
+      document.getElementById("btnBuscar").addEventListener("click", setRangoFechas);
+      document.getElementById("fechaDesde").addEventListener("change", setRangoFechas);
+      document.getElementById("fechaHasta").addEventListener("change", setRangoFechas);
+    }
+
+    renderTablaTipificaciones();
+    renderDetalles();
+    renderIncumplimiento();
+    renderLlamadas();
+    renderInbound();
+    setRangoFechas();
+    setupTabs();
+    setupSidebarAndModules();
+    setupFilters();
+  </script>
+</body>
+</html>

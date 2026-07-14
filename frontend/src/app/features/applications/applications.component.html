@@ -1,0 +1,131 @@
+<!-- ============================================
+CODETEC - Aplicaciones (Grilla)
+============================================ -->
+
+<section class="applications section-padding">
+  <div class="container">
+    <!-- Header -->
+    <div class="section-header">
+      <span class="section-tag">Showroom</span>
+      <h1 class="section-title">
+        Explora Nuestras <span>Aplicaciones</span>
+      </h1>
+      <p class="section-subtitle">
+        Descubre una colección de aplicaciones software desarrolladas con 
+        las últimas tecnologías y mejores prácticas del mercado.
+      </p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-wrapper">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input 
+          type="text" 
+          placeholder="Buscar aplicaciones..." 
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+          class="search-input">
+        <button *ngIf="searchTerm" class="clear-search" (click)="clearSearch()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="filters">
+        <div class="filter-group">
+          <label>Categoría</label>
+          <div class="filter-buttons">
+            <button 
+              *ngFor="let category of categories"
+              class="filter-btn"
+              [class.active]="selectedCategory === category"
+              (click)="onCategoryChange(category)">
+              {{ category }}
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label>Estado</label>
+          <div class="filter-buttons">
+            <button 
+              *ngFor="let status of statusFilters"
+              class="filter-btn"
+              [class.active]="selectedStatus === status.value"
+              (click)="onStatusChange(status.value)">
+              {{ status.label }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Cargando aplicaciones...</p>
+    </div>
+
+    <!-- Grid -->
+    <div *ngIf="!isLoading" class="applications-grid">
+      <div *ngIf="filteredApplications.length === 0" class="no-results">
+        <i class="fas fa-search"></i>
+        <h3>No se encontraron aplicaciones</h3>
+        <p>Intenta con otros filtros o términos de búsqueda</p>
+        <button class="btn-primary-custom" (click)="clearSearch(); selectedCategory='Todas'; selectedStatus='all'; filterApplications()">
+          Limpiar filtros
+        </button>
+      </div>
+
+      <app-card 
+        *ngFor="let app of filteredApplications"
+        [application]="app"
+        [isFeatured]="app.featured || false"
+        (view)="onViewApplication($event)">
+      </app-card>
+    </div>
+
+    <!-- Resultados -->
+    <div *ngIf="!isLoading && filteredApplications.length > 0" class="results-info">
+      <p>
+        Mostrando <strong>{{ filteredApplications.length }}</strong> 
+        aplicación{{ filteredApplications.length > 1 ? 'es' : '' }}
+        <span *ngIf="selectedCategory !== 'Todas'">en <strong>{{ selectedCategory }}</strong></span>
+        <span *ngIf="selectedStatus !== 'all'">con estado <strong>{{ getStatusLabel(selectedStatus) }}</strong></span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL PARA DEMO -->
+<div class="demo-modal" *ngIf="showDemoModal" (click)="closeDemoModal()">
+  <div class="demo-modal-content" (click)="$event.stopPropagation()">
+    <div class="demo-modal-header">
+      <h3>
+        {{ selectedApplication?.name }}
+        <span *ngIf="isLoadingDemo" class="loading-spinner-small">
+          <i class="fas fa-spinner fa-spin"></i> Cargando...
+        </span>
+      </h3>
+      <button class="close-btn" (click)="closeDemoModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="demo-modal-body">
+      <ng-container *ngIf="showDemoModal && selectedApplication">
+        <iframe 
+          [src]="getSafeUrl(selectedApplication.demoPath)"
+          class="demo-iframe"
+          frameborder="0"
+          (load)="onIframeLoad()"
+          [hidden]="isLoadingDemo">
+        </iframe>
+      </ng-container>
+      
+      <div *ngIf="isLoadingDemo" class="iframe-loading">
+        <div class="spinner"></div>
+        <p>Cargando demo...</p>
+      </div>
+    </div>
+  </div>
+</div>

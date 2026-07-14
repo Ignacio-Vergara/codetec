@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control Tecnicos - Demo Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    :root {
+      --font-main: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --bg-primary: #f5f7fb;
+      --bg-card: #ffffff;
+      --bg-soft: #f8fafc;
+      --line: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --sidebar-dark: #1a237e;
+      --sidebar-light: #3f51b5;
+      --blue: #3b82f6;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --pink: #ec4899;
+      --radius: 14px;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 4px 10px rgba(15, 23, 42, 0.06);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--font-main);
+      background: var(--bg-primary);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .app { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      width: 250px;
+      background: linear-gradient(180deg, var(--sidebar-dark) 0%, var(--sidebar-light) 100%);
+      color: #fff;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 14px rgba(0, 0, 0, 0.15);
+      transition: width 0.25s ease;
+    }
+
+    .sidebar.collapsed { width: 74px; }
+
+    .sidebar-header {
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #ffffff 10%, #c7d2fe 100%);
+      display: grid;
+      place-items: center;
+      color: #1e3a8a;
+      font-size: 20px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .brand { font-weight: 700; letter-spacing: 0.4px; white-space: nowrap; }
+
+    .sidebar.collapsed .brand,
+    .sidebar.collapsed .nav-text,
+    .sidebar.collapsed .footer-text { display: none; }
+
+    .nav { padding: 12px 8px; display: grid; gap: 6px; }
+
+    .nav-btn {
+      border: 0;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.92);
+      text-align: left;
+      border-radius: 10px;
+      padding: 11px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.2s ease;
+    }
+
+    .nav-btn i { font-size: 17px; width: 20px; text-align: center; }
+    .nav-btn.active,
+    .nav-btn:hover { background: rgba(255, 255, 255, 0.15); }
+
+    .sidebar-footer {
+      margin-top: auto;
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 12px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .main {
+      margin-left: 250px;
+      width: calc(100% - 250px);
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.25s ease, width 0.25s ease;
+    }
+
+    .main.expanded {
+      margin-left: 74px;
+      width: calc(100% - 74px);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      height: 70px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+    }
+
+    .left { display: flex; align-items: center; gap: 12px; }
+
+    .menu-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .title { margin: 0; font-size: 18px; }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .online {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+    }
+
+    .page { padding: 20px; display: grid; gap: 18px; }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      min-height: 130px;
+      padding: 18px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .metric-icon {
+      width: 62px;
+      height: 62px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+
+    .i-total { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .i-pend { background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); }
+    .i-init { background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%); }
+    .i-fin { background: linear-gradient(135deg, #10b981 0%, #34d399 100%); }
+
+    .metric-value { font-size: 34px; line-height: 1; font-weight: 800; }
+    .metric-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .metric-sub { margin-top: 5px; color: var(--muted); font-size: 12px; }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .panel-title { margin: 0; font-size: 16px; }
+
+    .panel-body { padding: 14px 16px; }
+
+    .fab-filter {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      border: 0;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      color: #fff;
+      font-size: 20px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      z-index: 20;
+    }
+
+    .demo-badge-wrap {
+      padding: 10px 22px 0;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .demo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #92400e;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 999px;
+      padding: 6px 10px;
+      margin-bottom: 10px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--bg-soft);
+      color: var(--text);
+      font-size: 13px;
+      padding: 9px 10px;
+      font-family: inherit;
+    }
+
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-soft { background: #fff; border: 1px solid var(--line); color: var(--text); }
+
+    .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 10px; }
+
+    table { width: 100%; min-width: 1200px; border-collapse: collapse; font-size: 13px; }
+    th, td { border-bottom: 1px solid var(--line); padding: 10px 10px; text-align: left; vertical-align: top; }
+
+    th {
+      background: var(--bg-soft);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      font-size: 11px;
+      position: sticky;
+      top: 0;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .st-pendiente { color: #92400e; background: #fef3c7; }
+    .st-iniciada { color: #1d4ed8; background: #dbeafe; }
+    .st-finalizada { color: #065f46; background: #d1fae5; }
+    .st-cancelada { color: #991b1b; background: #fee2e2; }
+
+    .dm-ok { color: #065f46; background: #dcfce7; }
+    .dm-leve { color: #92400e; background: #fef3c7; }
+    .dm-grave { color: #9f1239; background: #fce7f3; }
+
+    .paging {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .muted { color: var(--muted); font-size: 12px; }
+
+    .hidden { display: none !important; }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: grid;
+      place-items: center;
+      z-index: 60;
+      padding: 16px;
+    }
+
+    .modal-card {
+      width: min(980px, 100%);
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.2);
+    }
+
+    .timeline-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .timeline-btn:hover {
+      background: var(--bg-soft);
+    }
+
+    .timeline-wrap {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .timeline-node {
+      position: relative;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 12px;
+      min-height: 110px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .timeline-step {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: var(--blue);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .timeline-time { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 5px; }
+    .timeline-text { font-size: 13px; }
+
+    .timeline-node::after {
+      content: "";
+      position: absolute;
+      top: 42px;
+      right: -15px;
+      width: 14px;
+      border-top: 2px solid #cbd5e1;
+    }
+
+    .timeline-node:nth-child(4n)::after { display: none; }
+
+    .footer {
+      margin-top: auto;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: #fff;
+    }
+
+    @media (max-width: 1180px) {
+      .field-grid { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
+      .timeline-wrap { grid-template-columns: repeat(2, 1fr); }
+      .timeline-node:nth-child(4n)::after { display: block; }
+      .timeline-node:nth-child(2n)::after { display: none; }
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { width: 74px; }
+      .sidebar .brand,
+      .sidebar .nav-text,
+      .sidebar .footer-text { display: none; }
+      .main { margin-left: 74px; width: calc(100% - 74px); }
+      .user span { display: none; }
+    }
+
+    @media (max-width: 640px) {
+      .page { padding: 14px; }
+      .demo-badge-wrap { padding: 10px 14px 0; }
+      .field-grid { grid-template-columns: 1fr; }
+      .timeline-wrap { grid-template-columns: 1fr; }
+      .timeline-node::after { display: none; }
+      .metrics-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo"><i class="bi bi-diagram-3"></i></div>
+        <div class="brand">TELCO DASHBOARD</div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-btn active" data-view="dashboardView">
+          <i class="bi bi-speedometer2"></i>
+          <span class="nav-text">Dashboard</span>
+        </button>
+        <button class="nav-btn" data-view="timelineView">
+          <i class="bi bi-clock-history"></i>
+          <span class="nav-text">Timeline</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <i class="bi bi-shield-check"></i>
+        <span class="footer-text">Datos demo anonimizados</span>
+      </div>
+    </aside>
+
+    <main id="main" class="main">
+      <header class="topbar">
+        <div class="left">
+          <button id="menuBtn" class="menu-btn"><i class="bi bi-list"></i></button>
+          <h1 id="viewTitle" class="title">Dashboard</h1>
+        </div>
+        <div class="user">
+          <div class="online"></div>
+          <span>demo.supervisor</span>
+          <span>Operacional</span>
+        </div>
+      </header>
+
+      <div class="demo-badge-wrap">
+        <span class="demo-badge">
+          <i class="bi bi-database-fill-lock"></i>
+          Todos los datos mostrados son de demo
+        </span>
+      </div>
+
+      <section id="dashboardView" class="page">
+        <div id="metricsGrid" class="metrics-grid"></div>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title"><i class="bi bi-table"></i> Ordenes de trabajo</h2>
+            <span id="countInfo" class="muted"></span>
+          </div>
+          <div class="panel-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID OFSC</th>
+                    <th>Cliente</th>
+                    <th>Direccion</th>
+                    <th>Comuna</th>
+                    <th>Estado</th>
+                    <th>Servicio</th>
+                    <th>Ventana</th>
+                    <th>Demora</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyOrders"></tbody>
+              </table>
+            </div>
+            <div class="paging">
+              <button id="prevBtn" class="btn btn-soft"><i class="bi bi-arrow-left"></i> Anterior</button>
+              <span id="pageInfo" class="muted"></span>
+              <button id="nextBtn" class="btn btn-soft">Siguiente <i class="bi bi-arrow-right"></i></button>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section id="timelineView" class="page hidden">
+        <section class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title"><i class="bi bi-clock-history"></i> Linea de tiempo del tecnico</h2>
+            <select id="timelineSelect" style="border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13px;"></select>
+          </div>
+          <div class="panel-body">
+            <div id="timelineGrid" class="timeline-wrap"></div>
+          </div>
+        </section>
+      </section>
+
+      <footer class="footer">
+        <span>Dashboard TELCO Demo v1.0</span>
+        <span>Sistema operacional | Solo datos ficticios</span>
+      </footer>
+    </main>
+  </div>
+
+  <button id="filterFab" class="fab-filter" title="Mostrar filtros"><i class="bi bi-search"></i></button>
+
+  <div id="filtersModal" class="modal-overlay hidden">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="filtersTitle">
+      <div class="panel-header">
+        <h2 id="filtersTitle" class="panel-title"><i class="bi bi-funnel"></i> Filtros de busqueda</h2>
+        <button id="closeFiltersModal" class="btn btn-soft"><i class="bi bi-x-lg"></i> Cerrar</button>
+      </div>
+      <div class="panel-body">
+        <div class="field-grid">
+          <div class="field">
+            <label>Estado</label>
+            <select id="fEstado">
+              <option value="">Todos</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Iniciada">Iniciada</option>
+              <option value="Finalizada">Finalizada</option>
+              <option value="Cancelada">Cancelada</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Comuna</label>
+            <select id="fComuna"><option value="">Todas</option></select>
+          </div>
+          <div class="field">
+            <label>Tecnico</label>
+            <select id="fTecnico"><option value="">Todos</option></select>
+          </div>
+          <div class="field">
+            <label>Buscar</label>
+            <input id="fText" type="text" placeholder="ID OFSC, cliente o direccion" />
+          </div>
+        </div>
+        <div class="actions">
+          <button id="applyBtn" class="btn btn-primary"><i class="bi bi-check2-circle"></i> Aplicar</button>
+          <button id="clearBtn" class="btn btn-soft"><i class="bi bi-eraser"></i> Limpiar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="orderTimelineModal" class="modal-overlay hidden">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="orderTimelineTitle">
+      <div class="panel-header">
+        <h2 id="orderTimelineTitle" class="panel-title"><i class="bi bi-clock-history"></i> Timeline de la orden</h2>
+        <button id="closeOrderTimelineModal" class="btn btn-soft"><i class="bi bi-x-lg"></i> Cerrar</button>
+      </div>
+      <div class="panel-body">
+        <div id="orderTimelineGrid" class="timeline-wrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const data = [
+      { id: "7765984", oxt: "OXT-240001", cliente: "MILLACERO SPA", direccion: "Av. Providencia 1123", comuna: "Providencia", estado: "Pendiente", servicio: "Instalacion Fibra", tecnico: "Luis Jara", subgerencia: "Hogar", contratista: "Rex", tramo: "AM 08:00-12:00", demora: "En tiempo", timeline: [{ hora: "08:05", texto: "Orden creada" }, { hora: "08:22", texto: "Tecnico asignado" }, { hora: "09:02", texto: "Contacto confirmado" }, { hora: "09:35", texto: "En ruta" }] },
+      { id: "7765985", oxt: "OXT-240002", cliente: "ARTEFIX LTDA", direccion: "Pasaje Sur 49", comuna: "La Florida", estado: "Iniciada", servicio: "Migracion Cobre-Fibra", tecnico: "Andrea Mena", subgerencia: "Empresas", contratista: "Bio", tramo: "AM 10:00-14:00", demora: "Leve", timeline: [{ hora: "10:01", texto: "Inicio de trabajo" }, { hora: "10:47", texto: "Pruebas de enlace" }, { hora: "11:21", texto: "Ajuste de potencia" }, { hora: "11:55", texto: "Pendiente validacion" }] },
+      { id: "7765986", oxt: "OXT-240003", cliente: "CASA FRONTERA SPA", direccion: "Ruta Central 550", comuna: "Maipu", estado: "Finalizada", servicio: "Reparacion ONT", tecnico: "Matias Roa", subgerencia: "Hogar", contratista: "Entel", tramo: "PM 14:00-18:00", demora: "En tiempo", timeline: [{ hora: "14:04", texto: "Arribo a domicilio" }, { hora: "14:31", texto: "Reemplazo de equipo" }, { hora: "14:52", texto: "Prueba de navegacion" }, { hora: "15:05", texto: "Cierre operativo" }] },
+      { id: "7765987", oxt: "OXT-240004", cliente: "DISTRIBUIDORA NOVA", direccion: "San Martin 220", comuna: "Quilicura", estado: "Cancelada", servicio: "Instalacion TV", tecnico: "Ignacia Soto", subgerencia: "Hogar", contratista: "Sice", tramo: "PM 13:00-17:00", demora: "No aplica", timeline: [{ hora: "13:10", texto: "Cliente solicita reagenda" }, { hora: "13:25", texto: "Orden cancelada" }] },
+      { id: "7765988", oxt: "OXT-240005", cliente: "LABORED CHILE", direccion: "Los Pinos 870", comuna: "Nunoa", estado: "Pendiente", servicio: "Upgrade 600MB", tecnico: "Luis Jara", subgerencia: "Empresas", contratista: "Rex", tramo: "AM 09:00-13:00", demora: "En tiempo", timeline: [{ hora: "09:02", texto: "Orden registrada" }, { hora: "09:20", texto: "Cliente notificado" }, { hora: "10:00", texto: "Asignacion de recursos" }] },
+      { id: "7765989", oxt: "OXT-240006", cliente: "MKT HORIZON", direccion: "Los Jazmines 177", comuna: "Santiago", estado: "Iniciada", servicio: "Reparacion Router", tecnico: "Andrea Mena", subgerencia: "Empresas", contratista: "Bio", tramo: "PM 15:00-19:00", demora: "Grave", timeline: [{ hora: "15:05", texto: "Inicio en terreno" }, { hora: "16:40", texto: "Falla compleja detectada" }, { hora: "17:30", texto: "Escalamiento N2" }, { hora: "18:05", texto: "Pendiente visita adicional" }] },
+      { id: "7765990", oxt: "OXT-240007", cliente: "INMOBILIARIA SUD", direccion: "Apoquindo 8210", comuna: "Las Condes", estado: "Finalizada", servicio: "Instalacion Telefonia", tecnico: "Pablo Valdes", subgerencia: "Empresas", contratista: "Hometelecom", tramo: "AM 08:30-12:30", demora: "En tiempo", timeline: [{ hora: "08:35", texto: "Inicio" }, { hora: "09:15", texto: "Prueba de tono" }, { hora: "09:40", texto: "Firma digital" }] },
+      { id: "7765991", oxt: "OXT-240008", cliente: "COFFEE NODE", direccion: "Diagonal 115", comuna: "Macul", estado: "Pendiente", servicio: "Diagnostico Enlace", tecnico: "Pablo Valdes", subgerencia: "Hogar", contratista: "Zener", tramo: "PM 12:00-16:00", demora: "En tiempo", timeline: [{ hora: "12:02", texto: "Orden en bandeja" }, { hora: "12:18", texto: "Revision previa" }] }
+    ];
+
+    const state = {
+      rows: [...data],
+      page: 1,
+      pageSize: 6
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function statusClass(value) {
+      if (value === "Pendiente") return "st-pendiente";
+      if (value === "Iniciada") return "st-iniciada";
+      if (value === "Finalizada") return "st-finalizada";
+      return "st-cancelada";
+    }
+
+    function delayClass(value) {
+      if (value === "Leve") return "dm-leve";
+      if (value === "Grave") return "dm-grave";
+      return "dm-ok";
+    }
+
+    function renderMetrics() {
+      const total = state.rows.length;
+      const pendiente = state.rows.filter((x) => x.estado === "Pendiente").length;
+      const iniciada = state.rows.filter((x) => x.estado === "Iniciada").length;
+      const finalizada = state.rows.filter((x) => x.estado === "Finalizada").length;
+
+      const cards = [
+        { icon: "bi bi-bar-chart-line", cls: "i-total", label: "Total Ordenes", value: total, sub: "Gestion activa" },
+        { icon: "bi bi-hourglass-split", cls: "i-pend", label: "Pendientes", value: pendiente, sub: "Del total" },
+        { icon: "bi bi-play-circle", cls: "i-init", label: "Iniciadas", value: iniciada, sub: "En ejecucion" },
+        { icon: "bi bi-check-circle", cls: "i-fin", label: "Finalizadas", value: finalizada, sub: "Cierre operativo" }
+      ];
+
+      $("metricsGrid").innerHTML = cards.map((card) => `
+        <article class="metric-card">
+          <div class="metric-icon ${card.cls}"><i class="${card.icon}"></i></div>
+          <div>
+            <div class="metric-value">${card.value}</div>
+            <div class="metric-label">${card.label}</div>
+            <div class="metric-sub">${card.sub}</div>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderTable() {
+      const start = (state.page - 1) * state.pageSize;
+      const paged = state.rows.slice(start, start + state.pageSize);
+      $("tbodyOrders").innerHTML = paged.map((row) => `
+        <tr>
+          <td>${row.id}</td>
+          <td>${row.cliente}</td>
+          <td>${row.direccion}</td>
+          <td>${row.comuna}</td>
+          <td><span class="badge ${statusClass(row.estado)}">${row.estado}</span></td>
+          <td>${row.servicio}</td>
+          <td>${row.tramo}</td>
+          <td><span class="badge ${delayClass(row.demora)}">${row.demora}</span></td>
+          <td>
+            <button class="timeline-btn js-open-order-timeline" data-order-id="${row.id}">
+              <i class="bi bi-diagram-2"></i>
+              Ver timeline
+            </button>
+          </td>
+        </tr>
+      `).join("");
+
+      const pages = Math.max(1, Math.ceil(state.rows.length / state.pageSize));
+      $("pageInfo").textContent = `Pagina ${state.page} de ${pages}`;
+      $("countInfo").textContent = `${state.rows.length} registros`;
+      $("prevBtn").disabled = state.page === 1;
+      $("nextBtn").disabled = state.page === pages;
+      renderMetrics();
+    }
+
+    function filterRows() {
+      const estado = $("fEstado").value;
+      const comuna = $("fComuna").value;
+      const tecnico = $("fTecnico").value;
+      const text = $("fText").value.trim().toLowerCase();
+
+      state.rows = data.filter((row) => {
+        const byEstado = !estado || row.estado === estado;
+        const byComuna = !comuna || row.comuna === comuna;
+        const byTecnico = !tecnico || row.tecnico === tecnico;
+        const source = `${row.id} ${row.cliente} ${row.direccion}`.toLowerCase();
+        const byText = !text || source.includes(text);
+        return byEstado && byComuna && byTecnico && byText;
+      });
+
+      state.page = 1;
+      renderTable();
+    }
+
+    function clearFilters() {
+      ["fEstado", "fComuna", "fTecnico", "fText"].forEach((id) => $(id).value = "");
+      state.rows = [...data];
+      state.page = 1;
+      renderTable();
+    }
+
+    function renderTimeline(orderId) {
+      const order = data.find((x) => x.id === orderId) || data[0];
+      $("timelineGrid").innerHTML = order.timeline.map((ev, i) => `
+        <article class="timeline-node">
+          <div class="timeline-step">${i + 1}</div>
+          <div class="timeline-time">${ev.hora}</div>
+          <div class="timeline-text">${ev.texto}</div>
+        </article>
+      `).join("");
+    }
+
+    function renderTimelineInto(targetId, orderId) {
+      const order = data.find((x) => x.id === orderId) || data[0];
+      $(targetId).innerHTML = order.timeline.map((ev, i) => `
+        <article class="timeline-node">
+          <div class="timeline-step">${i + 1}</div>
+          <div class="timeline-time">${ev.hora}</div>
+          <div class="timeline-text">${ev.texto}</div>
+        </article>
+      `).join("");
+    }
+
+    function changeView(id) {
+      ["dashboardView", "timelineView"].forEach((viewId) => {
+        $(viewId).classList.toggle("hidden", viewId !== id);
+      });
+      document.querySelectorAll(".nav-btn").forEach((button) => {
+        button.classList.toggle("active", button.dataset.view === id);
+      });
+      $("viewTitle").textContent = id === "dashboardView" ? "Dashboard" : "Timeline";
+    }
+
+    function initFilters() {
+      const comunas = [...new Set(data.map((x) => x.comuna))].sort();
+      const tecnicos = [...new Set(data.map((x) => x.tecnico))].sort();
+      comunas.forEach((value) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        $("fComuna").appendChild(option);
+      });
+      tecnicos.forEach((value) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        $("fTecnico").appendChild(option);
+      });
+    }
+
+    function initTimelineSelector() {
+      $("timelineSelect").innerHTML = data.map((x) => `<option value="${x.id}">${x.id} | ${x.cliente}</option>`).join("");
+      $("timelineSelect").addEventListener("change", (e) => renderTimeline(e.target.value));
+      renderTimeline(data[0].id);
+    }
+
+    function initEvents() {
+      $("menuBtn").addEventListener("click", () => {
+        $("sidebar").classList.toggle("collapsed");
+        $("main").classList.toggle("expanded");
+      });
+
+      $("filterFab").addEventListener("click", () => {
+        $("filtersModal").classList.remove("hidden");
+      });
+
+      $("closeFiltersModal").addEventListener("click", () => {
+        $("filtersModal").classList.add("hidden");
+      });
+
+      $("filtersModal").addEventListener("click", (event) => {
+        if (event.target.id === "filtersModal") {
+          $("filtersModal").classList.add("hidden");
+        }
+      });
+
+      $("applyBtn").addEventListener("click", filterRows);
+      $("clearBtn").addEventListener("click", clearFilters);
+
+      $("applyBtn").addEventListener("click", () => {
+        $("filtersModal").classList.add("hidden");
+      });
+
+      $("tbodyOrders").addEventListener("click", (event) => {
+        const button = event.target.closest(".js-open-order-timeline");
+        if (!button) return;
+        const orderId = button.dataset.orderId;
+        $("orderTimelineTitle").innerHTML = `<i class="bi bi-clock-history"></i> Timeline de orden ${orderId}`;
+        renderTimelineInto("orderTimelineGrid", orderId);
+        $("orderTimelineModal").classList.remove("hidden");
+      });
+
+      $("closeOrderTimelineModal").addEventListener("click", () => {
+        $("orderTimelineModal").classList.add("hidden");
+      });
+
+      $("orderTimelineModal").addEventListener("click", (event) => {
+        if (event.target.id === "orderTimelineModal") {
+          $("orderTimelineModal").classList.add("hidden");
+        }
+      });
+
+      $("prevBtn").addEventListener("click", () => {
+        state.page = Math.max(1, state.page - 1);
+        renderTable();
+      });
+
+      $("nextBtn").addEventListener("click", () => {
+        const pages = Math.max(1, Math.ceil(state.rows.length / state.pageSize));
+        state.page = Math.min(pages, state.page + 1);
+        renderTable();
+      });
+
+      document.querySelectorAll(".nav-btn").forEach((button) => {
+        button.addEventListener("click", () => changeView(button.dataset.view));
+      });
+    }
+
+    initFilters();
+    initTimelineSelector();
+    initEvents();
+    renderTable();
+  </script>
+</body>
+</html>

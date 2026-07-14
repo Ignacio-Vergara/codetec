@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Demo - Calendarizacion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #3f51b5;
+      --surface: #ffffff;
+      --bg: #f8f9fa;
+      --text: #2c3e50;
+      --muted: #6c757d;
+      --line: #e9ecef;
+      --ok: #4caf50;
+      --warn: #ff9800;
+      --bad: #f44336;
+      --today: #e3f2fd;
+      --today-border: #2196f3;
+      --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      --hour-height: 78px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Roboto, "Helvetica Neue", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      height: 64px;
+      background: var(--primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      gap: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      font-size: 1.05rem;
+      white-space: nowrap;
+    }
+
+    .spacer { flex: 1; }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      padding: 4px 12px;
+      background: rgba(76, 175, 80, 0.22);
+      color: #d8ffd9;
+      white-space: nowrap;
+    }
+
+    .user-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.92rem;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      padding: 6px 10px;
+      white-space: nowrap;
+    }
+
+    .container {
+      width: min(1200px, 100% - 26px);
+      margin: 18px auto 22px;
+    }
+
+    .calendar-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 0 4px;
+    }
+
+    .header-left,
+    .header-center,
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .control,
+    .btn,
+    .view-btn {
+      border: 1px solid #cfd4da;
+      background: #fff;
+      color: var(--text);
+      border-radius: 8px;
+      height: 38px;
+      padding: 0 12px;
+      font: inherit;
+      font-size: 0.93rem;
+    }
+
+    .control {
+      min-width: 250px;
+    }
+
+    .btn {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: 0.2s;
+    }
+
+    .btn:hover { background: #f3f4f6; }
+
+    .icon-btn {
+      width: 38px;
+      padding: 0;
+      font-size: 20px;
+    }
+
+    .current-period {
+      min-width: 250px;
+      text-align: center;
+      font-size: 1.24rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .readonly-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 20px;
+      font-size: 0.86rem;
+      padding: 5px 10px;
+      background: var(--warn);
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .view-switch {
+      display: inline-flex;
+      border: 1px solid #cfd4da;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .view-btn {
+      border: 0;
+      border-right: 1px solid #cfd4da;
+      border-radius: 0;
+      cursor: pointer;
+    }
+
+    .view-btn:last-child { border-right: 0; }
+
+    .view-btn.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .surface {
+      background: var(--surface);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .month-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background: #f8f9fa;
+      border-bottom: 2px solid var(--line);
+      text-align: center;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .weekday {
+      padding: 14px 6px;
+      font-size: 0.9rem;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-rows: repeat(6, minmax(132px, 1fr));
+    }
+
+    .month-grid .month-week {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      min-height: 0;
+    }
+
+    .month-day {
+      border: 1px solid var(--line);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: 0.2s;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .month-day.other-month {
+      background: #fafbfc;
+      color: #b0b8c2;
+    }
+
+    .month-day.today {
+      background: var(--today);
+      border: 2px solid var(--today-border);
+      padding: 7px;
+    }
+
+    .month-day:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 7px rgba(0, 0, 0, 0.1);
+      z-index: 2;
+    }
+
+    .day-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+    }
+
+    .event-chip {
+      border-radius: 4px;
+      padding: 4px 7px;
+      font-size: 0.76rem;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: default;
+    }
+
+    .more-events {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-style: italic;
+      padding-left: 2px;
+    }
+
+    .week-view,
+    .day-view {
+      overflow: auto;
+      max-height: 73vh;
+    }
+
+    .week-header {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: #f8f9fa;
+      border-bottom: 2px solid var(--line);
+      display: grid;
+      grid-template-columns: 62px repeat(7, minmax(110px, 1fr));
+    }
+
+    .week-body {
+      display: grid;
+      grid-template-columns: 62px repeat(7, minmax(110px, 1fr));
+      min-height: calc(var(--hour-height) * 13);
+      position: relative;
+    }
+
+    .time-col {
+      background: #f8f9fa;
+      border-right: 1px solid var(--line);
+    }
+
+    .hour-label {
+      height: var(--hour-height);
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      padding-right: 8px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: var(--hour-height);
+    }
+
+    .week-day-head {
+      border-right: 1px solid var(--line);
+      text-align: center;
+      padding: 11px 4px;
+    }
+
+    .week-day-head.today {
+      background: var(--today);
+    }
+
+    .day-name { font-size: 0.86rem; text-transform: uppercase; color: var(--muted); }
+    .day-date { font-size: 1.45rem; line-height: 1.15; font-weight: 600; }
+    .day-month { font-size: 0.8rem; color: var(--muted); }
+
+    .day-col {
+      position: relative;
+      border-right: 1px solid var(--line);
+      min-height: 100%;
+    }
+
+    .hour-line {
+      height: var(--hour-height);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .events-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .event-card {
+      position: absolute;
+      border-radius: 6px;
+      color: #fff;
+      padding: 6px 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+    }
+
+    .event-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 5px;
+      font-size: 0.72rem;
+    }
+
+    .tag {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 3px;
+      padding: 1px 4px;
+      white-space: nowrap;
+    }
+
+    .event-client {
+      font-size: 0.82rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .event-status {
+      font-size: 0.66rem;
+      opacity: 0.96;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+      padding: 2px 4px;
+      align-self: flex-start;
+      margin-top: auto;
+    }
+
+    .day-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 18px;
+      border-bottom: 2px solid var(--line);
+      background: #f8f9fa;
+      position: sticky;
+      top: 0;
+      z-index: 4;
+    }
+
+    .day-title h2 {
+      margin: 0;
+      font-size: 1.45rem;
+      font-weight: 600;
+    }
+
+    .day-title p {
+      margin: 4px 0 0;
+      color: var(--muted);
+    }
+
+    .count-badge {
+      background: var(--today-border);
+      color: #fff;
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-weight: 500;
+      font-size: 0.92rem;
+    }
+
+    .day-grid {
+      display: grid;
+      grid-template-columns: 62px minmax(300px, 1fr);
+      min-height: calc(var(--hour-height) * 13);
+      position: relative;
+    }
+
+    .day-column {
+      position: relative;
+      border-right: 1px solid var(--line);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 12px;
+      margin-top: 2px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    .legend-color {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+    }
+
+    .note {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 14px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .event-modal {
+      width: min(520px, 100%);
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #f8f9fa;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 1.12rem;
+    }
+
+    .close-btn {
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      color: #586270;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .close-btn:hover {
+      background: #e9ecef;
+    }
+
+    .modal-body {
+      padding: 16px 18px 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.9rem;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      color: #5f6b79;
+      font-size: 0.8rem;
+    }
+
+    .field div {
+      padding: 8px 10px;
+      border: 1px solid #d8dde3;
+      border-radius: 7px;
+      background: #fff;
+      min-height: 36px;
+    }
+
+    @media (max-width: 1024px) {
+      .header-left,
+      .header-center,
+      .header-right {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .week-header,
+      .week-body,
+      .day-grid {
+        min-width: 860px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .topbar {
+        height: auto;
+        min-height: 64px;
+        flex-wrap: wrap;
+        row-gap: 8px;
+        padding: 10px 14px;
+      }
+
+      .spacer { display: none; }
+
+      .logo { width: 100%; }
+
+      .role-badge,
+      .user-chip {
+        font-size: 0.8rem;
+      }
+
+      .control { min-width: 100%; }
+      .current-period { min-width: 180px; font-size: 1.1rem; }
+      .container { width: calc(100% - 14px); margin-top: 12px; }
+      .month-grid .month-week { min-height: 120px; }
+
+      .modal-body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="logo">
+        <span class="material-icons">calendar_today</span>
+        <span>Calendarizacion</span>
+      </div>
+      <div class="spacer"></div>
+      <div class="role-badge">
+        <span class="material-icons" style="font-size:16px">edit</span>
+        <span>Editor</span>
+      </div>
+      <div class="user-chip">
+        <span class="material-icons" style="font-size:19px">account_circle</span>
+        <span>Usuario Demo</span>
+        <span class="material-icons" style="font-size:20px">arrow_drop_down</span>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="calendar-container">
+        <div class="calendar-header">
+          <div class="header-left">
+            <select id="itpSelect" class="control" aria-label="Seleccionar equipo"></select>
+          </div>
+
+          <div class="header-center">
+            <button id="prevBtn" class="btn icon-btn" title="Anterior" aria-label="Anterior">
+              <span class="material-icons">chevron_left</span>
+            </button>
+            <div id="currentPeriod" class="current-period"></div>
+            <button id="nextBtn" class="btn icon-btn" title="Siguiente" aria-label="Siguiente">
+              <span class="material-icons">chevron_right</span>
+            </button>
+            <button id="todayBtn" class="btn">Hoy</button>
+          </div>
+
+          <div class="header-right">
+            <div class="view-switch" role="group" aria-label="Cambiar vista">
+              <button class="view-btn active" data-view="month">Mensual</button>
+              <button class="view-btn" data-view="week">Semanal</button>
+              <button class="view-btn" data-view="day">Diario</button>
+            </div>
+            <span class="readonly-badge">
+              <span class="material-icons" style="font-size:18px">visibility</span>
+              Solo lectura
+            </span>
+          </div>
+        </div>
+
+        <div id="calendarSurface" class="surface"></div>
+
+        <div class="legend">
+          <span class="legend-item"><span class="legend-color" style="background:#4caf50"></span>Agendamiento exitoso</span>
+          <span class="legend-item"><span class="legend-color" style="background:#ff9800"></span>Provisional</span>
+          <span class="legend-item"><span class="legend-color" style="background:#f44336"></span>Fuera de oficina</span>
+        </div>
+
+        <div class="note">Demo de portafolio con datos ficticios creados para exhibicion. No contiene informacion real de empresa ni clientes.</div>
+      </section>
+    </main>
+  </div>
+
+  <div id="eventModalOverlay" class="modal-overlay" aria-hidden="true">
+    <div class="event-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <h3 id="modalTitle" class="modal-title">Detalle del evento</h3>
+        <button id="closeModalBtn" class="close-btn" aria-label="Cerrar">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="field"><label>Fecha</label><div id="modalFecha"></div></div>
+        <div class="field"><label>Horario</label><div id="modalHorario"></div></div>
+        <div class="field"><label>OTT</label><div id="modalOtt"></div></div>
+        <div class="field"><label>Estado</label><div id="modalEstado"></div></div>
+        <div class="field full"><label>Cliente</label><div id="modalCliente"></div></div>
+        <div class="field full"><label>Observaciones</label><div id="modalObs"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const monthNames = [
+      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+    const weekNames = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
+    const weekShort = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
+    const startHour = 8;
+    const endHour = 20;
+
+    const state = {
+      view: "month",
+      currentDate: new Date(2026, 6, 11),
+      selectedItpId: "itp-01"
+    };
+
+    const itps = [
+      { id: "itp-01", nombre: "Zona Norte - Equipo A" },
+      { id: "itp-02", nombre: "Zona Centro - Equipo B" },
+      { id: "itp-03", nombre: "Zona Sur - Equipo C" }
+    ];
+
+    const events = [
+      { id: 1, itpId: "itp-01", date: "2026-07-10", start: "09:00", end: "10:30", ott: "501201", cliente: "Clinica Rio Verde", estado: "Agendamiento exitoso", obs: "Instalacion inicial de enlace." },
+      { id: 2, itpId: "itp-01", date: "2026-07-10", start: "09:15", end: "11:00", ott: "501332", cliente: "Logistica Aurora", estado: "Provisional", obs: "Pendiente confirmacion de sala tecnica." },
+      { id: 3, itpId: "itp-01", date: "2026-07-11", start: "08:30", end: "09:30", ott: "500987", cliente: "Mercado del Puerto", estado: "Agendamiento exitoso", obs: "Reemplazo de CPE principal." },
+      { id: 4, itpId: "itp-01", date: "2026-07-11", start: "10:00", end: "12:00", ott: "501674", cliente: "Farmacia del Sol", estado: "Fuera de oficina", obs: "Sitio sin energia comercial." },
+      { id: 5, itpId: "itp-01", date: "2026-07-11", start: "10:00", end: "12:30", ott: "501675", cliente: "Banco Ciudad Norte", estado: "Provisional", obs: "En espera de autorizacion de acceso." },
+      { id: 6, itpId: "itp-01", date: "2026-07-11", start: "15:00", end: "17:00", ott: "501711", cliente: "Escuela Tecnica 17", estado: "Agendamiento exitoso", obs: "Ventana compartida con proveedor electrico." },
+      { id: 7, itpId: "itp-01", date: "2026-07-13", start: "11:00", end: "13:00", ott: "501822", cliente: "Hospital San Bruno", estado: "Agendamiento exitoso", obs: "Prueba de latencia y estabilidad." },
+      { id: 8, itpId: "itp-01", date: "2026-07-14", start: "16:30", end: "18:00", ott: "501911", cliente: "Hotel Paraiso Urbano", estado: "Provisional", obs: "Visita tecnica de validacion previa." },
+      { id: 9, itpId: "itp-01", date: "2026-07-16", start: "09:00", end: "11:30", ott: "502020", cliente: "Universidad del Oeste", estado: "Agendamiento exitoso", obs: "Trabajo coordinado con red interna." },
+      { id: 10, itpId: "itp-01", date: "2026-07-22", start: "14:00", end: "17:00", ott: "502100", cliente: "Municipio de San Pedro", estado: "Fuera de oficina", obs: "Sitio inaccesible por mantenimiento edilicio." },
+      { id: 11, itpId: "itp-02", date: "2026-07-11", start: "09:00", end: "10:00", ott: "600100", cliente: "Cliente Demo Uno", estado: "Provisional", obs: "Punto de acceso en revision." },
+      { id: 12, itpId: "itp-03", date: "2026-07-11", start: "12:00", end: "13:30", ott: "700200", cliente: "Cliente Demo Dos", estado: "Agendamiento exitoso", obs: "Ajuste final y firma de conformidad." }
+    ];
+
+    const surface = document.getElementById("calendarSurface");
+    const periodLabel = document.getElementById("currentPeriod");
+    const itpSelect = document.getElementById("itpSelect");
+    const eventModalOverlay = document.getElementById("eventModalOverlay");
+
+    init();
+
+    function init() {
+      itps.forEach((itp) => {
+        const opt = document.createElement("option");
+        opt.value = itp.id;
+        opt.textContent = itp.nombre;
+        itpSelect.appendChild(opt);
+      });
+      itpSelect.value = state.selectedItpId;
+
+      itpSelect.addEventListener("change", (e) => {
+        state.selectedItpId = e.target.value;
+        render();
+      });
+
+      document.getElementById("prevBtn").addEventListener("click", () => movePeriod(-1));
+      document.getElementById("nextBtn").addEventListener("click", () => movePeriod(1));
+      document.getElementById("todayBtn").addEventListener("click", () => {
+        state.currentDate = new Date(2026, 6, 11);
+        render();
+      });
+
+      document.querySelectorAll(".view-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".view-btn").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          state.view = btn.dataset.view;
+          render();
+        });
+      });
+
+      surface.addEventListener("click", (event) => {
+        const target = event.target.closest("[data-event-id]");
+        if (!target) return;
+        openEventModal(Number(target.dataset.eventId));
+      });
+
+      eventModalOverlay.addEventListener("click", (event) => {
+        if (event.target === eventModalOverlay) closeEventModal();
+      });
+
+      document.getElementById("closeModalBtn").addEventListener("click", closeEventModal);
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && eventModalOverlay.classList.contains("open")) {
+          closeEventModal();
+        }
+      });
+
+      render();
+    }
+
+    function movePeriod(step) {
+      const d = new Date(state.currentDate);
+      if (state.view === "month") {
+        d.setMonth(d.getMonth() + step);
+      } else if (state.view === "week") {
+        d.setDate(d.getDate() + step * 7);
+      } else {
+        d.setDate(d.getDate() + step);
+      }
+      state.currentDate = d;
+      render();
+    }
+
+    function render() {
+      renderPeriodLabel();
+      if (state.view === "month") renderMonth();
+      if (state.view === "week") renderWeek();
+      if (state.view === "day") renderDay();
+    }
+
+    function renderPeriodLabel() {
+      const d = state.currentDate;
+      if (state.view === "month") {
+        periodLabel.textContent = monthNames[d.getMonth()] + " " + d.getFullYear();
+        return;
+      }
+      if (state.view === "week") {
+        const days = getWeekDays(d);
+        const first = days[0];
+        const last = days[6];
+        periodLabel.textContent = formatShortDate(first) + " - " + formatShortDate(last, true);
+        return;
+      }
+      periodLabel.textContent = weekNames[d.getDay()] + ", " + formatLongDate(d);
+    }
+
+    function renderMonth() {
+      const d = state.currentDate;
+      const year = d.getFullYear();
+      const month = d.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const start = new Date(firstDay);
+      start.setDate(start.getDate() - start.getDay());
+
+      let html = '<div class="month-view">';
+      html += '<div class="month-weekdays">' + weekShort.map((n) => '<div class="weekday">' + n + '</div>').join("") + '</div>';
+      html += '<div class="month-grid">';
+
+      const activeEvents = getActiveEvents();
+
+      for (let w = 0; w < 6; w += 1) {
+        html += '<div class="month-week">';
+        for (let i = 0; i < 7; i += 1) {
+          const day = new Date(start);
+          day.setDate(start.getDate() + w * 7 + i);
+          const dateKey = toDateKey(day);
+          const dayEvents = activeEvents.filter((e) => e.date === dateKey);
+          const classes = ["month-day"];
+          if (day.getMonth() !== month) classes.push("other-month");
+          if (isSameDay(day, new Date(2026, 6, 11))) classes.push("today");
+
+          html += '<div class="' + classes.join(" ") + '">';
+          html += '<div class="day-header"><span>' + day.getDate() + '</span></div>';
+          dayEvents.slice(0, 3).forEach((e) => {
+            html += '<div class="event-chip" data-event-id="' + e.id + '" style="background:' + statusColor(e.estado) + '">' + e.start + " - " + escapeHtml(e.cliente) + '</div>';
+          });
+          if (dayEvents.length > 3) {
+            html += '<div class="more-events">+' + (dayEvents.length - 3) + " mas</div>";
+          }
+          html += "</div>";
+        }
+        html += "</div>";
+      }
+
+      html += "</div></div>";
+      surface.innerHTML = html;
+    }
+
+    function renderWeek() {
+      const days = getWeekDays(state.currentDate);
+      const activeEvents = getActiveEvents();
+
+      let html = '<div class="week-view">';
+      html += '<div class="week-header">';
+      html += '<div class="time-col"></div>';
+      days.forEach((d) => {
+        const todayClass = isSameDay(d, new Date(2026, 6, 11)) ? " today" : "";
+        html += '<div class="week-day-head' + todayClass + '">';
+        html += '<div class="day-name">' + weekShort[d.getDay()] + '</div>';
+        html += '<div class="day-date">' + d.getDate() + '</div>';
+        html += '<div class="day-month">' + monthNames[d.getMonth()].slice(0, 3) + '</div>';
+        html += "</div>";
+      });
+      html += "</div>";
+
+      html += '<div class="week-body">';
+      html += '<div class="time-col">';
+      for (let h = startHour; h <= endHour; h += 1) html += '<div class="hour-label">' + h + ':00</div>';
+      html += "</div>";
+
+      days.forEach((day) => {
+        const dayKey = toDateKey(day);
+        const dayEvents = activeEvents.filter((e) => e.date === dayKey).sort((a, b) => a.start.localeCompare(b.start));
+
+        html += '<div class="day-col">';
+        for (let h = startHour; h <= endHour; h += 1) html += '<div class="hour-line"></div>';
+        html += '<div class="events-layer">';
+
+        dayEvents.forEach((ev) => {
+          const overlaps = dayEvents.filter((other) => rangesOverlap(ev, other));
+          const overlapIndex = overlaps.findIndex((e) => e.id === ev.id);
+          const width = Math.max(96 / overlaps.length, 40);
+          const left = overlapIndex * width;
+          const top = timeToOffset(ev.start);
+          const height = Math.max(40, timeToOffset(ev.end) - timeToOffset(ev.start));
+
+          html += '<div class="event-card" data-event-id="' + ev.id + '" style="top:' + top + "px;height:" + height + "px;left:" + left + "%;width:" + width + "%;background:" + statusColor(ev.estado) + '">';
+          html += '<div class="event-header"><span class="tag">' + ev.start + "-" + ev.end + '</span><span class="tag">OTT ' + ev.ott + '</span></div>';
+          html += '<div class="event-client">' + escapeHtml(ev.cliente) + "</div>";
+          html += '<div class="event-status">' + ev.estado + "</div>";
+          html += "</div>";
+        });
+
+        html += "</div></div>";
+      });
+
+      html += "</div></div>";
+      surface.innerHTML = html;
+    }
+
+    function renderDay() {
+      const day = new Date(state.currentDate);
+      const dayKey = toDateKey(day);
+      const dayEvents = getActiveEvents().filter((e) => e.date === dayKey).sort((a, b) => a.start.localeCompare(b.start));
+
+      let html = '<div class="day-view">';
+      html += '<div class="day-title"><div><h2>' + weekNames[day.getDay()] + '</h2><p>' + formatLongDate(day) + '</p></div>';
+      html += '<div class="count-badge">' + dayEvents.length + " evento" + (dayEvents.length === 1 ? "" : "s") + "</div></div>";
+
+      html += '<div class="day-grid">';
+      html += '<div class="time-col">';
+      for (let h = startHour; h <= endHour; h += 1) html += '<div class="hour-label">' + h + ':00</div>';
+      html += "</div>";
+
+      html += '<div class="day-column">';
+      for (let h = startHour; h <= endHour; h += 1) html += '<div class="hour-line"></div>';
+      html += '<div class="events-layer">';
+
+      dayEvents.forEach((ev) => {
+        const overlaps = dayEvents.filter((other) => rangesOverlap(ev, other));
+        const overlapIndex = overlaps.findIndex((e) => e.id === ev.id);
+        const width = Math.max(96 / overlaps.length, 42);
+        const left = overlapIndex * width;
+        const top = timeToOffset(ev.start);
+        const height = Math.max(48, timeToOffset(ev.end) - timeToOffset(ev.start));
+
+        html += '<div class="event-card" data-event-id="' + ev.id + '" style="top:' + top + "px;height:" + height + "px;left:" + left + "%;width:" + width + "%;background:" + statusColor(ev.estado) + '">';
+        html += '<div class="event-header"><span class="tag">' + ev.start + "-" + ev.end + '</span><span class="tag">OTT ' + ev.ott + '</span></div>';
+        html += '<div class="event-client">' + escapeHtml(ev.cliente) + "</div>";
+        html += '<div class="event-status">' + ev.estado + "</div>";
+        html += "</div>";
+      });
+
+      if (!dayEvents.length) {
+        html += '<div style="position:absolute;inset:0;display:grid;place-items:center;color:#6c757d;font-size:1.05rem;">No hay eventos programados para este dia</div>';
+      }
+
+      html += "</div></div></div></div>";
+      surface.innerHTML = html;
+    }
+
+    function openEventModal(eventId) {
+      const eventData = events.find((event) => event.id === eventId);
+      if (!eventData) return;
+
+      const eventDate = new Date(eventData.date + "T00:00:00");
+      document.getElementById("modalFecha").textContent = formatLongDate(eventDate);
+      document.getElementById("modalHorario").textContent = eventData.start + " - " + eventData.end;
+      document.getElementById("modalOtt").textContent = eventData.ott;
+      document.getElementById("modalEstado").textContent = eventData.estado;
+      document.getElementById("modalCliente").textContent = eventData.cliente;
+      document.getElementById("modalObs").textContent = eventData.obs || "Sin observaciones";
+
+      eventModalOverlay.classList.add("open");
+      eventModalOverlay.setAttribute("aria-hidden", "false");
+    }
+
+    function closeEventModal() {
+      eventModalOverlay.classList.remove("open");
+      eventModalOverlay.setAttribute("aria-hidden", "true");
+    }
+
+    function getActiveEvents() {
+      return events.filter((e) => e.itpId === state.selectedItpId);
+    }
+
+    function getWeekDays(baseDate) {
+      const ref = new Date(baseDate);
+      ref.setHours(0, 0, 0, 0);
+      const start = new Date(ref);
+      start.setDate(ref.getDate() - ref.getDay());
+      return Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        return d;
+      });
+    }
+
+    function toDateKey(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return y + "-" + m + "-" + d;
+    }
+
+    function isSameDay(a, b) {
+      return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    }
+
+    function statusColor(status) {
+      if (status === "Agendamiento exitoso") return "#4caf50";
+      if (status === "Provisional") return "#ff9800";
+      return "#f44336";
+    }
+
+    function timeToOffset(time) {
+      const [h, m] = time.split(":").map(Number);
+      const totalMin = (h - startHour) * 60 + m;
+      return (totalMin / 60) * parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--hour-height"));
+    }
+
+    function toMinutes(t) {
+      const [h, m] = t.split(":").map(Number);
+      return h * 60 + m;
+    }
+
+    function rangesOverlap(a, b) {
+      if (a.id === b.id) return true;
+      const aStart = toMinutes(a.start);
+      const aEnd = toMinutes(a.end);
+      const bStart = toMinutes(b.start);
+      const bEnd = toMinutes(b.end);
+      return aStart < bEnd && bStart < aEnd;
+    }
+
+    function formatShortDate(date, includeYear = false) {
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = monthNames[date.getMonth()].slice(0, 3);
+      return includeYear ? day + " " + month + " " + date.getFullYear() : day + " " + month;
+    }
+
+    function formatLongDate(date) {
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = monthNames[date.getMonth()];
+      return day + " de " + month + " de " + date.getFullYear();
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>

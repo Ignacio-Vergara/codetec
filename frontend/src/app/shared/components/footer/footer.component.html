@@ -1,0 +1,61 @@
+<!-- ============================================
+CODETEC - Footer
+============================================ -->
+
+<footer class="footer">
+  <div class="footer-container">
+    <!-- Brand -->
+    <div class="footer-brand">
+      <img src="assets/images/logo-codetec.png" alt="Codetec" class="footer-logo">
+      <span class="brand-text">Codetec</span>
+      <p class="brand-description">
+        Software personalizado para impulsar tu negocio.
+      </p>
+    </div>
+
+    <!-- Enlaces -->
+    <div class="footer-links">
+      <div class="links-column">
+        <h4>Navegación</h4>
+        <ul>
+          <li><a routerLink="/">Inicio</a></li>
+          <li><a routerLink="/applications">Aplicaciones</a></li>
+          <li><a routerLink="/contact">Contacto</a></li>
+        </ul>
+      </div>
+      <div class="links-column">
+        <h4>Recursos</h4>
+        <ul>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Documentación</a></li>
+          <li><a href="#">Soporte</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Social -->
+    <div class="footer-social">
+      <h4>Conéctate</h4>
+      <div class="social-icons">
+        <a *ngFor="let social of socialLinks" 
+           [href]="social.url" 
+           target="_blank"
+           rel="noopener noreferrer"
+           [attr.aria-label]="social.name">
+          <i [class]="social.icon"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom -->
+  <div class="footer-bottom">
+    <div class="footer-container">
+      <p>&copy; {{ currentYear }} Codetec. Todos los derechos reservados.</p>
+      <p class="tech-stack">
+        Hecho con <i class="fas fa-heart" style="color: #00B894;"></i> usando 
+        Angular, Bootstrap y Python
+      </p>
+    </div>
+  </div>
+</footer>

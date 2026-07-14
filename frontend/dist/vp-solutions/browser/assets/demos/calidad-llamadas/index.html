@@ -1,0 +1,1449 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Calidad - Demo Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --surface: #ffffff;
+      --surface-alt: #f2f6fb;
+      --line: #dde6f0;
+      --ink: #0d1b2a;
+      --muted: #5f6f82;
+      --primary: #1d4ed8;
+      --primary-soft: #dbeafe;
+      --success: #059669;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --chip: #ecf2f8;
+      --shadow: 0 16px 40px rgba(16, 33, 56, 0.08);
+      --radius-xl: 20px;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      background: radial-gradient(circle at 10% -20%, #dff1ff 0%, transparent 42%),
+                  radial-gradient(circle at 90% 0%, #ffe8d2 0%, transparent 38%),
+                  var(--bg);
+      color: var(--ink);
+      font-family: Manrope, Segoe UI, sans-serif;
+      min-height: 100%;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(151, 173, 198, 0.3);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 14px 22px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1d4ed8, #0f766e);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 800;
+      box-shadow: 0 10px 20px rgba(29, 78, 216, 0.25);
+    }
+
+    .brand-copy {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .brand-title {
+      font-family: Space Grotesk, Manrope, sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .brand-note {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      border: 1px solid transparent;
+      background: transparent;
+      color: #365069;
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      transition: 160ms ease;
+    }
+
+    .tab:hover {
+      background: #ecf3fb;
+      color: #17344f;
+    }
+
+    .tab.active {
+      border-color: #c3daff;
+      background: linear-gradient(180deg, #eef5ff, #e5f0ff);
+      color: #11417a;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid #f3d6ac;
+      background: #fff9f0;
+      color: #8a4b03;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #dbeafe, #f0f9ff);
+      border: 1px solid #c9dfff;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e3a5f;
+    }
+
+    .main {
+      width: min(1320px, calc(100% - 24px));
+      margin: 18px auto 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: reveal 280ms ease-out;
+    }
+
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .page-head {
+      padding: 22px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff, #f7fbff);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    h1, h2, h3, h4 {
+      margin: 0;
+      font-family: Space Grotesk, Manrope, sans-serif;
+      letter-spacing: 0.01em;
+    }
+
+    h1 { font-size: 27px; }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .btn {
+      border: 1px solid transparent;
+      background: var(--surface-alt);
+      color: #15324f;
+      border-radius: 11px;
+      padding: 9px 13px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 130ms ease, box-shadow 130ms ease, background 130ms ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(18, 40, 70, 0.12);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #1d4ed8, #1859a9);
+      color: #fff;
+    }
+
+    .btn.success {
+      background: linear-gradient(135deg, #0d9488, #0f766e);
+      color: #fff;
+    }
+
+    .btn.ghost {
+      border-color: var(--line);
+      background: #fff;
+    }
+
+    .grid-kpi {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .kpi {
+      background: linear-gradient(165deg, #fafdff 0%, #edf5ff 100%);
+      border: 1px solid #d8e5f4;
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi::after {
+      content: "";
+      position: absolute;
+      right: -16px;
+      top: -16px;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(29, 78, 216, 0.22), rgba(29, 78, 216, 0));
+    }
+
+    .kpi-title {
+      color: #4a627c;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .kpi-value {
+      font-family: Space Grotesk, Manrope, sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .kpi-foot {
+      margin-top: 7px;
+      font-size: 12px;
+      color: #5b728d;
+    }
+
+    .content {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .filters {
+      background: #f9fcff;
+      border: 1px solid #d9e6f3;
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #455f79;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    input, select, textarea {
+      border-radius: 9px;
+      border: 1px solid #c5d8eb;
+      background: #fff;
+      color: #10253f;
+      font-family: inherit;
+      font-size: 14px;
+      padding: 9px 10px;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #4e88f3;
+      box-shadow: 0 0 0 3px rgba(78, 136, 243, 0.15);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid #dbe6f2;
+      border-radius: var(--radius-lg);
+      background: #fff;
+    }
+
+    th, td {
+      border-bottom: 1px solid #e8eef5;
+      text-align: left;
+      padding: 10px;
+      font-size: 13px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f4f8fd;
+      color: #3d5873;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tr:hover td {
+      background: #f9fcff;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      background: var(--chip);
+      color: #22405e;
+      border: 1px solid #d7e5f5;
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      margin: 1px 4px 1px 0;
+      white-space: nowrap;
+    }
+
+    .score {
+      display: inline-flex;
+      min-width: 52px;
+      justify-content: center;
+      font-weight: 800;
+      border-radius: 999px;
+      padding: 4px 8px;
+      border: 1px solid;
+      font-size: 12px;
+    }
+
+    .score.good {
+      background: #e6f9ee;
+      color: #0f7a4f;
+      border-color: #b8ebd1;
+    }
+
+    .score.mid {
+      background: #fff7e9;
+      color: #9a6004;
+      border-color: #f4dfb5;
+    }
+
+    .score.bad {
+      background: #feecec;
+      color: #9f1f1f;
+      border-color: #f8c8c8;
+    }
+
+    .linkish {
+      color: #1e50a2;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .linkish:hover { text-decoration: underline; }
+
+    .row-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tiny {
+      padding: 6px 8px;
+      font-size: 11px;
+      border-radius: 8px;
+    }
+
+    .cols {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: #fff;
+      padding: 14px;
+    }
+
+    .card h3 {
+      font-size: 17px;
+      margin-bottom: 10px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .meta {
+      background: #f6faff;
+      border: 1px solid #e0ebf7;
+      border-radius: 10px;
+      padding: 9px;
+    }
+
+    .meta-label {
+      color: #5a738f;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .meta-value {
+      margin-top: 4px;
+      font-weight: 700;
+      font-size: 13px;
+      color: #193652;
+    }
+
+    .timeline {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .timeline li {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid #e3ecf6;
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: #fbfdff;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #9bb6d2;
+    }
+
+    .dot.alert { background: #ef4444; }
+    .dot.action { background: #0ea5a4; }
+
+    .check-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-bottom: 10px;
+    }
+
+    .check-stat {
+      text-align: center;
+      border: 1px solid #e2ebf5;
+      border-radius: 9px;
+      background: #f8fbff;
+      padding: 8px;
+    }
+
+    .check-stat strong {
+      font-family: Space Grotesk, Manrope, sans-serif;
+      font-size: 22px;
+      display: block;
+    }
+
+    .check-list {
+      max-height: 280px;
+      overflow: auto;
+      padding-right: 4px;
+      display: grid;
+      gap: 7px;
+    }
+
+    .check-item {
+      border: 1px solid #e0eaf5;
+      border-radius: 10px;
+      padding: 8px;
+      background: #fff;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .status {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .status.ok { background: #16a34a; }
+    .status.no { background: #dc2626; }
+
+    .req {
+      margin-top: 4px;
+      display: inline-block;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: #fff5dc;
+      color: #8f5300;
+      border: 1px solid #f6dfaa;
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-weight: 800;
+    }
+
+    .bars {
+      display: grid;
+      gap: 8px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 42px;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+      color: #35506d;
+    }
+
+    .bar-track {
+      height: 9px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #e4edf7;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #3b82f6, #0ea5a4);
+    }
+
+    .transcript {
+      max-height: 260px;
+      overflow: auto;
+      background: #fafcff;
+      border: 1px solid #e3ebf5;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #24415f;
+      white-space: pre-wrap;
+    }
+
+    .empty {
+      border: 1px dashed #c5d6e8;
+      border-radius: var(--radius-lg);
+      background: #f8fbff;
+      padding: 26px;
+      text-align: center;
+      color: #5b738d;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 20, 36, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 40;
+      padding: 14px;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      width: min(520px, 100%);
+      background: #fff;
+      border: 1px solid #d3e0ef;
+      border-radius: 16px;
+      box-shadow: 0 26px 60px rgba(15, 28, 46, 0.24);
+      overflow: hidden;
+    }
+
+    .modal-head {
+      padding: 16px;
+      border-bottom: 1px solid #e3ebf5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .modal-foot {
+      padding: 14px 16px;
+      border-top: 1px solid #e3ebf5;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .mono { font-family: ui-monospace, Menlo, Monaco, monospace; }
+
+    .hide-mobile { display: table-cell; }
+
+    @media (max-width: 1120px) {
+      .grid-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filters { grid-template-columns: 1fr 1fr; }
+      .cols { grid-template-columns: 1fr; }
+      .hide-mobile { display: none; }
+    }
+
+    @media (max-width: 760px) {
+      .topbar-inner { padding: 12px; }
+      .main { width: calc(100% - 12px); margin-top: 12px; }
+      .page-head { padding: 16px; }
+      h1 { font-size: 22px; }
+      .tabs { width: 100%; }
+      .filters { grid-template-columns: 1fr; }
+      .grid-kpi { grid-template-columns: 1fr; padding: 14px; }
+      .content, .cols { padding: 12px; }
+      .meta-grid { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: 1fr; gap: 5px; }
+      .check-stats { grid-template-columns: 1fr; }
+      .pill { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-mark">AI</div>
+          <div class="brand-copy">
+            <div class="brand-title">AI Calidad</div>
+            <div class="brand-note">Demo navegable para portfolio</div>
+          </div>
+        </div>
+        <nav class="tabs" id="topTabs"></nav>
+        <div class="topbar-right">
+          <span class="pill">Datos 100% simulados</span>
+          <div class="avatar">AD</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="main" id="appMain"></main>
+  </div>
+
+  <div class="modal-backdrop" id="actionModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Registrar accion</h3>
+        <button class="btn ghost" id="closeModalBtn">Cerrar</button>
+      </div>
+      <div class="modal-body">
+        <div class="muted" id="modalContext"></div>
+        <label class="field">
+          <span class="label">Tipo de accion</span>
+          <select id="actionType">
+            <option value="reagendado">Reagendado</option>
+            <option value="derivado_comercial">Derivado Comercial</option>
+            <option value="sin_cambios">Sin cambios</option>
+            <option value="modificado_ok">Modificado OK</option>
+            <option value="re_llamado">Re llamado</option>
+            <option value="escalado">Escalado</option>
+            <option value="mal_evaluado_ia">Mal evaluado IA</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="label">Comentario</span>
+          <textarea id="actionComment" rows="4" placeholder="Ej: Se coordino seguimiento para el proximo bloque horario."></textarea>
+        </label>
+      </div>
+      <div class="modal-foot">
+        <button class="btn ghost" id="cancelModalBtn">Cancelar</button>
+        <button class="btn primary" id="saveModalBtn">Guardar accion</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TABS = [
+      { key: "telefonia", label: "Telefonia", route: "#/telefonia" },
+      { key: "dashboard", label: "AI Calidad", route: "#/dashboard" },
+      { key: "whatsapp", label: "AI WhatsApp", route: "#/whatsapp" }
+    ];
+
+    const ACTION_LABELS = {
+      reagendado: "Reagendado",
+      derivado_comercial: "Derivado Comercial",
+      sin_cambios: "Sin cambios",
+      modificado_ok: "Modificado OK",
+      re_llamado: "Re llamado",
+      escalado: "Escalado",
+      mal_evaluado_ia: "Mal evaluado IA"
+    };
+
+    const state = {
+      dashboardFilters: { search: "", product: "all", score: "all" },
+      whatsappFilters: { from: "", to: "", ai: "all" },
+      modal: { open: false, section: "", id: null },
+      evaluations: [
+        {
+          id: 1,
+          cdrId: "CDR-DEMO-001",
+          fecha: "2026-06-14T09:20:00",
+          agente: "Ariel Soto",
+          numeroOxt: "OXT-1001",
+          etapa: "Cierre",
+          producto: "Internet Fibra",
+          tipo: "Ventas",
+          telefono: "+56 9 6000 1001",
+          promedioScores: 8.9,
+          cambios: ["Horario", "Ajuste Plan"],
+          accionTomada: "",
+          tieneAlarma: true,
+          tieneAccion: false,
+          quality: [
+            { name: "Protocolo", value: 9 },
+            { name: "Claridad", value: 8 },
+            { name: "Resolucion", value: 9 },
+            { name: "Objeciones", value: 8 },
+            { name: "Cortesia", value: 10 }
+          ],
+          protocolChecks: [
+            { description: "Se identifica con nombre y area", checked: true, required: true },
+            { description: "Valida datos de cliente", checked: true, required: true },
+            { description: "Explica objetivo de la llamada", checked: true, required: true },
+            { description: "Entrega alternativas completas", checked: false, required: true },
+            { description: "Solicita confirmacion final", checked: true, required: true },
+            { description: "Cierra con proximo paso", checked: true, required: false }
+          ],
+          cambiosTimeline: [
+            { type: "cambio", text: "Cliente solicita horario PM para instalacion" },
+            { type: "cambio", text: "Se cambia plan base a plan familiar" }
+          ],
+          transcription: "AGENTE: Hola, le llamo de soporte comercial para confirmar su instalacion de fibra.\nCLIENTE: Perfecto, pero en la manana no hay nadie en casa.\nAGENTE: Le propongo bloque PM entre 14:00 y 20:00.\nCLIENTE: Ese bloque funciona.\nAGENTE: Tambien puedo incluir un upgrade de velocidad por 3 meses sin costo.\nCLIENTE: Me interesa, confirmemos asi."
+        },
+        {
+          id: 2,
+          cdrId: "CDR-DEMO-002",
+          fecha: "2026-06-14T11:05:00",
+          agente: "Camila Vera",
+          numeroOxt: "OXT-1002",
+          etapa: "Diagnostico",
+          producto: "Telefonia",
+          tipo: "Soporte",
+          telefono: "+56 9 6000 1002",
+          promedioScores: 6.4,
+          cambios: ["Direccion"],
+          accionTomada: "",
+          tieneAlarma: false,
+          tieneAccion: false,
+          quality: [
+            { name: "Protocolo", value: 6 },
+            { name: "Claridad", value: 7 },
+            { name: "Resolucion", value: 6 },
+            { name: "Objeciones", value: 5 },
+            { name: "Cortesia", value: 8 }
+          ],
+          protocolChecks: [
+            { description: "Se identifica con nombre y area", checked: true, required: true },
+            { description: "Valida datos de cliente", checked: false, required: true },
+            { description: "Explica objetivo de la llamada", checked: true, required: true },
+            { description: "Resume solucion aplicada", checked: false, required: true },
+            { description: "Solicita confirmacion final", checked: true, required: true }
+          ],
+          cambiosTimeline: [
+            { type: "cambio", text: "Cliente actualiza direccion para visita tecnica" }
+          ],
+          transcription: "AGENTE: Buenas, le contacto por su ticket de linea inestable.\nCLIENTE: Si, sigue con cortes.\nAGENTE: Ajuste la ruta y reinicie puerto remoto.\nCLIENTE: Mejoro, pero quedo pendiente validar en la tarde."
+        },
+        {
+          id: 3,
+          cdrId: "CDR-DEMO-003",
+          fecha: "2026-06-15T10:40:00",
+          agente: "Nicolas Abarca",
+          numeroOxt: "OXT-1003",
+          etapa: "Propuesta",
+          producto: "TV + Internet",
+          tipo: "Retencion",
+          telefono: "+56 9 6000 1003",
+          promedioScores: 7.6,
+          cambios: ["Descuento", "Canales Premium"],
+          accionTomada: "Sin cambios",
+          tieneAlarma: true,
+          tieneAccion: true,
+          quality: [
+            { name: "Protocolo", value: 8 },
+            { name: "Claridad", value: 8 },
+            { name: "Resolucion", value: 7 },
+            { name: "Objeciones", value: 7 },
+            { name: "Cortesia", value: 8 }
+          ],
+          protocolChecks: [
+            { description: "Se identifica con nombre y area", checked: true, required: true },
+            { description: "Valida datos de cliente", checked: true, required: true },
+            { description: "Explica objetivo de la llamada", checked: true, required: true },
+            { description: "Entrega alternativas completas", checked: true, required: true },
+            { description: "Solicita confirmacion final", checked: false, required: true }
+          ],
+          cambiosTimeline: [
+            { type: "cambio", text: "Cliente solicita bajar costo mensual" },
+            { type: "accion", text: "Supervisor valida mantener plan actual" }
+          ],
+          transcription: "AGENTE: Vemos su intencion de baja de servicio, quiero ofrecer opciones.\nCLIENTE: Si, estoy evaluando cambiar.\nAGENTE: Podemos aplicar descuento de fidelizacion por 4 meses.\nCLIENTE: Lo revisare hoy y le confirmo."
+        },
+        {
+          id: 4,
+          cdrId: "CDR-DEMO-004",
+          fecha: "2026-06-16T16:00:00",
+          agente: "Sofia Mella",
+          numeroOxt: "OXT-1004",
+          etapa: "Postventa",
+          producto: "Internet Fibra",
+          tipo: "Encuesta",
+          telefono: "+56 9 6000 1004",
+          promedioScores: 9.4,
+          cambios: [],
+          accionTomada: "",
+          tieneAlarma: false,
+          tieneAccion: false,
+          quality: [
+            { name: "Protocolo", value: 9 },
+            { name: "Claridad", value: 10 },
+            { name: "Resolucion", value: 9 },
+            { name: "Objeciones", value: 9 },
+            { name: "Cortesia", value: 10 }
+          ],
+          protocolChecks: [
+            { description: "Se identifica con nombre y area", checked: true, required: true },
+            { description: "Valida datos de cliente", checked: true, required: true },
+            { description: "Explica objetivo de la llamada", checked: true, required: true },
+            { description: "Solicita confirmacion final", checked: true, required: true },
+            { description: "Cierra con proximo paso", checked: true, required: false }
+          ],
+          cambiosTimeline: [],
+          transcription: "AGENTE: Le llamo para validar que la instalacion quedo operativa.\nCLIENTE: Todo funcionando perfecto, gracias.\nAGENTE: Excelente, dejamos nota de cierre satisfactorio."
+        }
+      ],
+      whatsapp: [
+        { id: 101, cliente: "EcoMercado Norte", telefono: "+56 9 7111 001", numeroOxt: "WSP-3001", fecha: "2026-06-15T09:00:00", estado: "ENVIADO", texto: "Recordatorio de visita tecnica para hoy PM", ai: "no", accionTomada: "" },
+        { id: 102, cliente: "Clinica Alameda", telefono: "+56 9 7111 002", numeroOxt: "WSP-3002", fecha: "2026-06-15T09:30:00", estado: "RESPONDIDO", texto: "Confirmacion de instalacion en sucursal central", ai: "si", accionTomada: "" },
+        { id: 103, cliente: "Panaderia Nuevo Sol", telefono: "+56 9 7111 003", numeroOxt: "WSP-3003", fecha: "2026-06-15T11:00:00", estado: "MODIFICADO", texto: "Cambio de franja horaria solicitado", ai: "si", accionTomada: "Sin cambios" },
+        { id: 104, cliente: "Laboratorio Sur", telefono: "+56 9 7111 004", numeroOxt: "WSP-3004", fecha: "2026-06-16T14:20:00", estado: "ENVIADO", texto: "Aviso preventivo de mantenimiento", ai: "no", accionTomada: "" },
+        { id: 105, cliente: "Estudio Atlas", telefono: "+56 9 7111 005", numeroOxt: "WSP-3005", fecha: "2026-06-16T16:45:00", estado: "RESPONDIDO", texto: "Cliente aprueba nueva fecha", ai: "si", accionTomada: "" }
+      ]
+    };
+
+    function scoreClass(score) {
+      if (score >= 8) return "good";
+      if (score >= 6.5) return "mid";
+      return "bad";
+    }
+
+    function fmtDate(value) {
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return "-";
+      return new Intl.DateTimeFormat("es-CL", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(d);
+    }
+
+    function getRoute() {
+      const hash = window.location.hash || "#/dashboard";
+      const clean = hash.replace(/^#\/?/, "");
+      const parts = clean.split("/");
+      return { section: parts[0] || "dashboard", id: parts[1] || "" };
+    }
+
+    function renderTabs(section) {
+      const tabs = document.getElementById("topTabs");
+      tabs.innerHTML = TABS.map((tab) => {
+        const active = section === tab.key || (section === "detail" && tab.key === "dashboard");
+        return `<a class="tab ${active ? "active" : ""}" href="${tab.route}">${tab.label}</a>`;
+      }).join("");
+    }
+
+    function dashboardKPIs(items) {
+      const total = items.length;
+      const withAlarm = items.filter((e) => e.tieneAlarma).length;
+      const withAction = items.filter((e) => e.accionTomada).length;
+      const avg = total ? (items.reduce((acc, e) => acc + e.promedioScores, 0) / total).toFixed(1) : "0.0";
+      return [
+        { title: "Evaluaciones", value: total, foot: "Registros simulados para demo" },
+        { title: "Con alerta", value: withAlarm, foot: "Casos con cambio detectado" },
+        { title: "Con accion", value: withAction, foot: "Gestion manual registrada" },
+        { title: "Promedio", value: avg, foot: "Escala de calidad 0 a 10" }
+      ];
+    }
+
+    function filteredEvaluations() {
+      return state.evaluations.filter((item) => {
+        const f = state.dashboardFilters;
+        const search = `${item.cdrId} ${item.agente} ${item.numeroOxt}`.toLowerCase();
+        const validSearch = !f.search || search.includes(f.search.toLowerCase());
+        const validProduct = f.product === "all" || item.producto === f.product;
+        let validScore = true;
+        if (f.score === "high") validScore = item.promedioScores >= 8;
+        if (f.score === "mid") validScore = item.promedioScores >= 6 && item.promedioScores < 8;
+        if (f.score === "low") validScore = item.promedioScores < 6;
+        return validSearch && validProduct && validScore;
+      });
+    }
+
+    function renderDashboard() {
+      const main = document.getElementById("appMain");
+      const rows = filteredEvaluations();
+      const products = [...new Set(state.evaluations.map((e) => e.producto))];
+      const kpis = dashboardKPIs(rows);
+
+      main.innerHTML = `
+        <section class="page-card">
+          <div class="page-head">
+            <div>
+              <h1>Dashboard de Calidad</h1>
+              <div class="subtitle">Monitoreo de llamadas con datos de muestra para portafolio interactivo.</div>
+            </div>
+            <div>
+              <button class="btn success" id="exportDashboard">Exportar CSV</button>
+            </div>
+          </div>
+          <div class="grid-kpi">
+            ${kpis.map((k) => `<article class="kpi"><div class="kpi-title">${k.title}</div><div class="kpi-value">${k.value}</div><div class="kpi-foot">${k.foot}</div></article>`).join("")}
+          </div>
+          <div class="content">
+            <div class="filters">
+              <label class="field">
+                <span class="label">Buscar</span>
+                <input id="fSearch" placeholder="CDR, agente, OXT" value="${state.dashboardFilters.search}" />
+              </label>
+              <label class="field">
+                <span class="label">Producto</span>
+                <select id="fProduct">
+                  <option value="all">Todos</option>
+                  ${products.map((p) => `<option value="${p}" ${state.dashboardFilters.product === p ? "selected" : ""}>${p}</option>`).join("")}
+                </select>
+              </label>
+              <label class="field">
+                <span class="label">Rango score</span>
+                <select id="fScore">
+                  <option value="all" ${state.dashboardFilters.score === "all" ? "selected" : ""}>Todos</option>
+                  <option value="high" ${state.dashboardFilters.score === "high" ? "selected" : ""}>8.0 o mas</option>
+                  <option value="mid" ${state.dashboardFilters.score === "mid" ? "selected" : ""}>6.0 a 7.9</option>
+                  <option value="low" ${state.dashboardFilters.score === "low" ? "selected" : ""}>Menor a 6.0</option>
+                </select>
+              </label>
+              <button class="btn primary" id="resetDashboard">Limpiar filtros</button>
+            </div>
+            ${rows.length ? `
+              <div style="overflow:auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>CDR ID</th>
+                      <th>Fecha</th>
+                      <th>Agente</th>
+                      <th class="hide-mobile">OXT</th>
+                      <th>Producto</th>
+                      <th>Score</th>
+                      <th>Cambios</th>
+                      <th>Accion</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${rows.map((e, i) => `
+                      <tr>
+                        <td>${i + 1}</td>
+                        <td><a class="linkish" href="#/detail/${e.cdrId}">${e.cdrId}</a></td>
+                        <td>${fmtDate(e.fecha)}</td>
+                        <td>${e.agente}</td>
+                        <td class="hide-mobile">${e.numeroOxt}</td>
+                        <td>${e.producto}</td>
+                        <td><span class="score ${scoreClass(e.promedioScores)}">${e.promedioScores.toFixed(1)}</span></td>
+                        <td>${e.cambios.length ? e.cambios.map((c) => `<span class="chip">${c}</span>`).join("") : "-"}</td>
+                        <td>${e.accionTomada ? `<span class="chip">${e.accionTomada}</span>` : "-"}</td>
+                        <td>
+                          <div class="row-actions">
+                            <a class="btn tiny ghost" href="#/detail/${e.cdrId}">Ver</a>
+                            <button class="btn tiny" data-open-action="dashboard:${e.cdrId}">Accion</button>
+                          </div>
+                        </td>
+                      </tr>
+                    `).join("")}
+                  </tbody>
+                </table>
+              </div>` : `<div class="empty">No hay resultados con los filtros activos.</div>`}
+          </div>
+        </section>
+      `;
+
+      document.getElementById("fSearch").addEventListener("input", (e) => {
+        state.dashboardFilters.search = e.target.value;
+        render();
+      });
+
+      document.getElementById("fProduct").addEventListener("change", (e) => {
+        state.dashboardFilters.product = e.target.value;
+        render();
+      });
+
+      document.getElementById("fScore").addEventListener("change", (e) => {
+        state.dashboardFilters.score = e.target.value;
+        render();
+      });
+
+      document.getElementById("resetDashboard").addEventListener("click", () => {
+        state.dashboardFilters = { search: "", product: "all", score: "all" };
+        render();
+      });
+
+      document.getElementById("exportDashboard").addEventListener("click", () => {
+        const headers = ["cdrId", "fecha", "agente", "oxt", "producto", "tipo", "score", "accion"];
+        const csvRows = rows.map((e) => [
+          e.cdrId,
+          fmtDate(e.fecha),
+          e.agente,
+          e.numeroOxt,
+          e.producto,
+          e.tipo,
+          e.promedioScores,
+          e.accionTomada || ""
+        ]);
+        downloadCsv("dashboard_demo.csv", headers, csvRows);
+      });
+    }
+
+    function renderDetail(cdrId) {
+      const main = document.getElementById("appMain");
+      const item = state.evaluations.find((e) => e.cdrId === cdrId);
+      if (!item) {
+        main.innerHTML = `<section class="page-card"><div class="content"><div class="empty">No se encontro la evaluacion solicitada. <a class="linkish" href="#/dashboard">Volver al dashboard</a></div></div></section>`;
+        return;
+      }
+
+      const totalChecks = item.protocolChecks.length;
+      const completed = item.protocolChecks.filter((p) => p.checked).length;
+      const required = item.protocolChecks.filter((p) => p.required).length;
+      const requiredCompleted = item.protocolChecks.filter((p) => p.required && p.checked).length;
+      const completion = totalChecks ? Math.round((completed / totalChecks) * 100) : 0;
+
+      main.innerHTML = `
+        <section class="page-card">
+          <div class="page-head">
+            <div>
+              <h1>Detalle de Evaluacion</h1>
+              <div class="subtitle"><a class="linkish" href="#/dashboard">Volver al Dashboard</a> | <span class="mono">${item.cdrId}</span> | ${fmtDate(item.fecha)}</div>
+            </div>
+            <div class="row-actions">
+              <button class="btn" data-open-action="dashboard:${item.cdrId}">Agregar accion</button>
+              <button class="btn primary" id="exportDetail">Exportar reporte</button>
+            </div>
+          </div>
+          <div class="cols">
+            <div class="stack">
+              <article class="card">
+                <h3>Informacion de la evaluacion</h3>
+                <div class="meta-grid">
+                  <div class="meta"><div class="meta-label">Agente</div><div class="meta-value">${item.agente}</div></div>
+                  <div class="meta"><div class="meta-label">Numero OXT</div><div class="meta-value">${item.numeroOxt}</div></div>
+                  <div class="meta"><div class="meta-label">Producto</div><div class="meta-value">${item.producto}</div></div>
+                  <div class="meta"><div class="meta-label">Tipo</div><div class="meta-value">${item.tipo}</div></div>
+                  <div class="meta"><div class="meta-label">Telefono</div><div class="meta-value">${item.telefono}</div></div>
+                  <div class="meta"><div class="meta-label">Promedio</div><div class="meta-value"><span class="score ${scoreClass(item.promedioScores)}">${item.promedioScores.toFixed(1)}</span></div></div>
+                </div>
+              </article>
+
+              <article class="card">
+                <h3>Alertas y cambios</h3>
+                ${item.cambiosTimeline.length ? `<ul class="timeline">
+                  ${item.cambiosTimeline.map((c) => `<li><span class="dot ${c.type === "accion" ? "action" : "alert"}"></span><span>${c.text}</span></li>`).join("")}
+                </ul>` : `<div class="muted">Sin cambios detectados en esta evaluacion.</div>`}
+              </article>
+
+              <article class="card">
+                <h3>Evaluacion de Protocolo</h3>
+                <div class="check-stats">
+                  <div class="check-stat"><strong>${completed}/${totalChecks}</strong><span class="muted">Completados</span></div>
+                  <div class="check-stat"><strong>${requiredCompleted}/${required}</strong><span class="muted">Requeridos</span></div>
+                  <div class="check-stat"><strong>${completion}%</strong><span class="muted">Cumplimiento</span></div>
+                </div>
+                <div class="check-list">
+                  ${item.protocolChecks.map((p) => `
+                    <div class="check-item">
+                      <span class="status ${p.checked ? "ok" : "no"}">${p.checked ? "OK" : "NO"}</span>
+                      <div>
+                        <div>${p.description}</div>
+                        ${p.required ? `<span class="req">Requerido</span>` : ""}
+                      </div>
+                    </div>
+                  `).join("")}
+                </div>
+              </article>
+            </div>
+
+            <div class="stack">
+              <article class="card">
+                <h3>Transcripcion</h3>
+                <div class="transcript">${item.transcription}</div>
+              </article>
+
+              <article class="card">
+                <h3>Resumen de calidad</h3>
+                <div class="bars">
+                  ${item.quality.map((q) => `
+                    <div class="bar-row">
+                      <span>${q.name}</span>
+                      <div class="bar-track"><div class="bar-fill" style="width:${q.value * 10}%"></div></div>
+                      <strong>${q.value}/10</strong>
+                    </div>
+                  `).join("")}
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+      `;
+
+      document.getElementById("exportDetail").addEventListener("click", () => {
+        const headers = ["campo", "valor"];
+        const csvRows = [
+          ["cdrId", item.cdrId],
+          ["agente", item.agente],
+          ["oxt", item.numeroOxt],
+          ["producto", item.producto],
+          ["tipo", item.tipo],
+          ["score", item.promedioScores.toFixed(1)],
+          ["fecha", fmtDate(item.fecha)]
+        ];
+        downloadCsv(`${item.cdrId.toLowerCase()}_detalle.csv`, headers, csvRows);
+      });
+    }
+
+    function filteredWhatsApp() {
+      return state.whatsapp.filter((m) => {
+        const f = state.whatsappFilters;
+        const msgDate = new Date(m.fecha).getTime();
+        const fromOk = !f.from || msgDate >= new Date(f.from + "T00:00:00").getTime();
+        const toOk = !f.to || msgDate <= new Date(f.to + "T23:59:59").getTime();
+        const aiOk = f.ai === "all" || m.ai === f.ai;
+        return fromOk && toOk && aiOk;
+      });
+    }
+
+    function renderWhatsapp() {
+      const main = document.getElementById("appMain");
+      const rows = filteredWhatsApp();
+      const sent = rows.filter((m) => m.estado === "ENVIADO").length;
+      const replied = rows.filter((m) => m.estado === "RESPONDIDO").length;
+      const modified = rows.filter((m) => m.estado === "MODIFICADO").length;
+
+      main.innerHTML = `
+        <section class="page-card">
+          <div class="page-head">
+            <div>
+              <h1>WhatsApp Business</h1>
+              <div class="subtitle">Gestion de mensajes, respuestas y ajustes IA (entorno demo).</div>
+            </div>
+            <button class="btn success" id="exportWhatsApp">Exportar CSV</button>
+          </div>
+          <div class="grid-kpi">
+            <article class="kpi"><div class="kpi-title">Mensajes enviados</div><div class="kpi-value">${sent}</div><div class="kpi-foot">Estado ENVIADO</div></article>
+            <article class="kpi"><div class="kpi-title">Respondidos</div><div class="kpi-value">${replied}</div><div class="kpi-foot">Respuesta de cliente</div></article>
+            <article class="kpi"><div class="kpi-title">Modificados IA</div><div class="kpi-value">${modified}</div><div class="kpi-foot">Ajuste automatizado</div></article>
+            <article class="kpi"><div class="kpi-title">Total visible</div><div class="kpi-value">${rows.length}</div><div class="kpi-foot">Filtrado actual</div></article>
+          </div>
+          <div class="content">
+            <div class="filters">
+              <label class="field">
+                <span class="label">Desde</span>
+                <input type="date" id="wFrom" value="${state.whatsappFilters.from}" />
+              </label>
+              <label class="field">
+                <span class="label">Hasta</span>
+                <input type="date" id="wTo" value="${state.whatsappFilters.to}" />
+              </label>
+              <label class="field">
+                <span class="label">IA</span>
+                <select id="wAi">
+                  <option value="all" ${state.whatsappFilters.ai === "all" ? "selected" : ""}>Todos</option>
+                  <option value="si" ${state.whatsappFilters.ai === "si" ? "selected" : ""}>Si</option>
+                  <option value="no" ${state.whatsappFilters.ai === "no" ? "selected" : ""}>No</option>
+                </select>
+              </label>
+              <button class="btn primary" id="resetWhatsApp">Limpiar filtros</button>
+            </div>
+            ${rows.length ? `<div style="overflow:auto;"><table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Cliente</th>
+                  <th class="hide-mobile">Telefono</th>
+                  <th>OXT</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                  <th>AI</th>
+                  <th>Texto</th>
+                  <th>Accion</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map((m, i) => `<tr>
+                  <td>${i + 1}</td>
+                  <td>${m.cliente}</td>
+                  <td class="hide-mobile">${m.telefono}</td>
+                  <td>${m.numeroOxt}</td>
+                  <td>${fmtDate(m.fecha)}</td>
+                  <td><span class="chip">${m.estado}</span></td>
+                  <td>${m.ai === "si" ? "Si" : "No"}</td>
+                  <td>${m.texto || "-"}</td>
+                  <td>
+                    <div class="row-actions">
+                      ${m.accionTomada ? `<span class="chip">${m.accionTomada}</span>` : ""}
+                      <button class="btn tiny" data-open-action="whatsapp:${m.id}">Accion</button>
+                    </div>
+                  </td>
+                </tr>`).join("")}
+              </tbody>
+            </table></div>` : `<div class="empty">No hay mensajes para los filtros seleccionados.</div>`}
+          </div>
+        </section>
+      `;
+
+      document.getElementById("wFrom").addEventListener("change", (e) => {
+        state.whatsappFilters.from = e.target.value;
+        render();
+      });
+      document.getElementById("wTo").addEventListener("change", (e) => {
+        state.whatsappFilters.to = e.target.value;
+        render();
+      });
+      document.getElementById("wAi").addEventListener("change", (e) => {
+        state.whatsappFilters.ai = e.target.value;
+        render();
+      });
+      document.getElementById("resetWhatsApp").addEventListener("click", () => {
+        state.whatsappFilters = { from: "", to: "", ai: "all" };
+        render();
+      });
+      document.getElementById("exportWhatsApp").addEventListener("click", () => {
+        const headers = ["cliente", "telefono", "oxt", "fecha", "estado", "ai", "accion"];
+        const csvRows = rows.map((m) => [m.cliente, m.telefono, m.numeroOxt, fmtDate(m.fecha), m.estado, m.ai, m.accionTomada || ""]);
+        downloadCsv("whatsapp_demo.csv", headers, csvRows);
+      });
+    }
+
+    function renderTelefonia() {
+      const main = document.getElementById("appMain");
+      main.innerHTML = `
+        <section class="page-card">
+          <div class="page-head">
+            <div>
+              <h1>Telefonia</h1>
+              <div class="subtitle">Modulo en construccion para esta demo.</div>
+            </div>
+            <a class="btn primary" href="#/dashboard">Volver al Dashboard</a>
+          </div>
+          <div class="content">
+            <div class="empty">
+              <h3 style="margin-bottom:8px;">Proximamente disponible</h3>
+              <div>En el proyecto original este modulo aun estaba en desarrollo. Se mantiene asi para replicar el estado real de avance.</div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function downloadCsv(fileName, headers, rows) {
+      const esc = (v) => `"${String(v ?? "").replaceAll('"', '""')}"`;
+      const data = [headers.map(esc).join(","), ...rows.map((r) => r.map(esc).join(","))].join("\n");
+      const blob = new Blob([data], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function bindGlobalActions() {
+      document.querySelectorAll("[data-open-action]").forEach((el) => {
+        el.addEventListener("click", () => {
+          const [section, id] = el.getAttribute("data-open-action").split(":");
+          openActionModal(section, id);
+        });
+      });
+    }
+
+    function openActionModal(section, id) {
+      state.modal = { open: true, section, id: Number.isNaN(Number(id)) ? id : Number(id) };
+      const backdrop = document.getElementById("actionModal");
+      const context = document.getElementById("modalContext");
+      const targetText = section === "dashboard" ? `Evaluacion: ${id}` : `Mensaje WhatsApp: ${id}`;
+      context.textContent = targetText;
+      document.getElementById("actionType").value = "reagendado";
+      document.getElementById("actionComment").value = "";
+      backdrop.classList.add("open");
+    }
+
+    function closeActionModal() {
+      state.modal = { open: false, section: "", id: null };
+      document.getElementById("actionModal").classList.remove("open");
+    }
+
+    function saveModalAction() {
+      if (!state.modal.open) return;
+      const type = document.getElementById("actionType").value;
+      const label = ACTION_LABELS[type] || type;
+      const section = state.modal.section;
+
+      if (section === "dashboard") {
+        const target = state.evaluations.find((e) => e.cdrId === String(state.modal.id));
+        if (target) {
+          target.accionTomada = label;
+          target.tieneAccion = true;
+          target.cambiosTimeline = target.cambiosTimeline || [];
+          target.cambiosTimeline.push({ type: "accion", text: `Accion registrada: ${label}` });
+        }
+      }
+
+      if (section === "whatsapp") {
+        const target = state.whatsapp.find((m) => m.id === Number(state.modal.id));
+        if (target) target.accionTomada = label;
+      }
+
+      closeActionModal();
+      render();
+    }
+
+    function bindModalEvents() {
+      document.getElementById("closeModalBtn").addEventListener("click", closeActionModal);
+      document.getElementById("cancelModalBtn").addEventListener("click", closeActionModal);
+      document.getElementById("saveModalBtn").addEventListener("click", saveModalAction);
+      document.getElementById("actionModal").addEventListener("click", (e) => {
+        if (e.target.id === "actionModal") closeActionModal();
+      });
+    }
+
+    function render() {
+      const route = getRoute();
+      renderTabs(route.section);
+
+      if (route.section === "detail") renderDetail(route.id);
+      else if (route.section === "whatsapp") renderWhatsapp();
+      else if (route.section === "telefonia") renderTelefonia();
+      else renderDashboard();
+
+      bindGlobalActions();
+    }
+
+    bindModalEvents();
+
+    if (!window.location.hash) {
+      window.location.hash = "#/dashboard";
+    } else {
+      render();
+    }
+
+    window.addEventListener("hashchange", render);
+  </script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!-- ============================================
+CODETEC - Home
+============================================ -->
+
+<!-- HERO SECTION -->
+<section class="hero section-padding" id="hero">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <span class="hero-badge">
+          <i class="fas fa-rocket"></i> Software Personalizado
+        </span>
+        <h1 class="hero-title">
+          Creamos <span>Software</span> a tu<br>
+          <span>Medida</span> para tu Negocio
+        </h1>
+        <p class="hero-description">
+          En Codetec transformamos tus ideas en soluciones digitales. 
+          Desarrollamos software personalizado que optimiza tus procesos, 
+          aumenta tu productividad y te ayuda a crecer.
+        </p>
+        <div class="hero-actions">
+          <button class="btn-primary-custom" (click)="navigateToApplications()">
+            <i class="fas fa-th-large"></i> Ver Nuestro Trabajo
+          </button>
+          <button class="btn-outline-custom" (click)="navigateToContact()">
+            <i class="fas fa-paper-plane"></i> Contáctanos
+          </button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-code">
+          <div class="code-line">
+            <span class="code-keyword">import</span> 
+            <span class="code-bracket">&#123;</span> 
+            <span class="code-class">Solutions</span> 
+            <span class="code-bracket">&#125;</span> 
+            <span class="code-keyword">from</span> 
+            <span class="code-string">'&#64;codetec/solutions'</span>
+          </div>
+          <div class="code-line">
+            <span class="code-keyword">const</span> 
+            <span class="code-variable">showroom</span> 
+            <span class="code-operator">=</span> 
+            <span class="code-keyword">new</span> 
+            <span class="code-class">Showroom</span>
+            <span class="code-bracket">&#40;&#41;</span>
+          </div>
+          <div class="code-line">
+            <span class="code-variable">showroom</span>
+            <span class="code-operator">.</span>
+            <span class="code-method">explore</span>
+            <span class="code-bracket">&#40;&#41;</span>
+          </div>
+          <div class="code-line cursor-blink">
+            <span class="code-comment">// Bienvenido a Codetec</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS SECTION -->
+<section class="stats section-padding">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item" *ngFor="let stat of stats">
+        <span class="stat-value">{{ stat.value }}</span>
+        <span class="stat-label">{{ stat.label }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section class="about section-padding" id="about">
+  <div class="container">
+    <div class="about-content">
+      <div class="about-text">
+        <span class="section-tag">Sobre Codetec</span>
+        <h2 class="section-title">
+          Transformamos tu <span>Negocio</span> con<br>
+          <span>Software</span> que Impulsa tu Crecimiento
+        </h2>
+        <p class="about-description">
+          En Codetec nos especializamos en el desarrollo de software personalizado. 
+          Nuestra misión es ayudar a empresas de todos los rubros a digitalizar sus 
+          procesos, optimizar sus operaciones y alcanzar sus objetivos a través de 
+          soluciones tecnológicas a medida. No importa tu industria, creamos herramientas 
+          que hacen tu trabajo más fácil y eficiente.
+        </p>
+        <div class="about-features">
+          <div class="feature">
+            <i class="fas fa-code"></i>
+            <div>
+              <h4>Software a Medida</h4>
+              <p>Soluciones personalizadas para tus necesidades específicas</p>
+            </div>
+          </div>
+          <div class="feature">
+            <i class="fas fa-paint-brush"></i>
+            <div>
+              <h4>Experiencia de Usuario</h4>
+              <p>Interfaces intuitivas que facilitan el trabajo diario</p>
+            </div>
+          </div>
+          <div class="feature">
+            <i class="fas fa-rocket"></i>
+            <div>
+              <h4>Escalabilidad</h4>
+              <p>Software que crece junto a tu negocio</p>
+            </div>
+          </div>
+          <div class="feature">
+            <i class="fas fa-handshake"></i>
+            <div>
+              <h4>Compromiso</h4>
+              <p>Acompañamiento continuo en tu transformación digital</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECHNOLOGIES SECTION -->
+<section class="technologies section-padding" id="technologies">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Stack Tecnológico</span>
+      <h2 class="section-title">
+        Tecnologías que <span>Impulsan</span><br>
+        Nuestras <span>Soluciones</span>
+      </h2>
+      <p class="section-subtitle">
+        Utilizamos las herramientas más modernas y eficientes del ecosistema 
+        de desarrollo para crear aplicaciones robustas y escalables.
+      </p>
+    </div>
+  </div>
+
+  <!-- Slider con pausa al hover -->
+  <div class="tech-slider-wrapper" 
+       (mouseenter)="onMouseEnter()" 
+       (mouseleave)="onMouseLeave()">
+    <div class="tech-slider-container">
+      <div class="tech-slider" 
+           [style.transform]="'translateX(' + getTranslateX() + 'px)'">
+        <div class="tech-item" *ngFor="let tech of technologies">
+          <div class="tech-icon" [style.color]="tech.color">
+            <i [class]="tech.icon"></i>
+          </div>
+          <span class="tech-name">{{ tech.name }}</span>
+          <span class="tech-category">{{ tech.category }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
